@@ -2,15 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemigo : MonoBehaviour {
+namespace Mangos{
 
-	// Use this for initialization
-	void Start () {
+	public class Enemigo : MangosBehaviour
+	{
+
+		// Use this for initialization
+		void Start () {
+			
+		}
 		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+		// Update is called once per frame
+		void Update () 
+		{
+			
+		}
 	}
 }
