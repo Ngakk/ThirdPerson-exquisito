@@ -16,6 +16,7 @@ namespace Mangos
 		void Start () 
 		{
 			rigi = gameObject.GetComponent<Rigidbody>();
+			delay = tiempo;
 		}
 		
 		// Update is called once per frame
