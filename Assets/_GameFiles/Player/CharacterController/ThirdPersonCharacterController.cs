@@ -7,11 +7,15 @@ namespace Mangos
     [RequireComponent(typeof(Rigidbody))]
     public class ThirdPersonCharacterController : MangosBehaviour
     {
-
-        public Camera cam;
-        public float speed;
-        Rigidbody rigi;
-        public Transform trans;
+		Rigidbody rigi;
+		Camera cam;
+		[HideInInspector]
+		public Vector3 dir, lookDir;
+		Vector3 scaler;
+		public float speed;
+		[Range(0, 1)]
+	    public float rotationSpeed;
+	    public float m_angle;
 
         private void Awake()
         {
@@ -22,6 +26,10 @@ namespace Mangos
         void Start()
         {
             rigi = GetComponent<Rigidbody>();
+			cam = Camera.main;
+			scaler = new Vector3 (1, 0, 1);
+	        lookDir = rigi.velocity;
+	        m_angle = 0;
         }
 
         // Update is called once per frame
@@ -31,16 +39,18 @@ namespace Mangos
         }
 
         public void Move(float xAxis, float yAxis)
-        {            
-            Vector3 axis = new Vector3(xAxis, 0, yAxis).normalized;
-            Vector3 camForward = Vector3.Scale(cam.transform.forward, new Vector3(1, 0, 1));
+	    {            
+        	
+			//Movement
+		    dir = Vector3.Scale (cam.transform.forward, scaler).normalized * yAxis + Vector3.Scale(cam.transform.right, scaler).normalized * xAxis;
+		    float dotProduct = Vector3.Dot(rigi.velocity.normalized, dir.normalized);
+			rigi.velocity = speed * dir.normalized;
 
-            Quaternion temp = cam.transform.rotation;
-            temp.SetFromToRotation(new Vector3(0, 0, 1), axis);
-            trans.rotation = temp;
-
-            rigi.velocity = speed * trans.forward;
-
+		    //Rotation
+		    lookDir += (rigi.velocity - lookDir) * rotationSpeed;
+			if (rigi.velocity != Vector3.zero) {
+				transform.LookAt (transform.position + lookDir.normalized);
+			}
         }
     }
 }
