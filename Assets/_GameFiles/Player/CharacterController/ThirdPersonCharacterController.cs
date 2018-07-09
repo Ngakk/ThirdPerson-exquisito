@@ -9,6 +9,7 @@ namespace Mangos
     {
 		Rigidbody rigi;
 		Camera cam;
+        Animator anim;
 		[HideInInspector]
 		public Vector3 dir, lookDir;
 		Vector3 scaler;
@@ -16,6 +17,8 @@ namespace Mangos
 		[Range(0, 1)]
 	    public float rotationSpeed;
 	    public float m_angle;
+        private bool canMove;
+        private bool holdingItem;
 
         private void Awake()
         {
@@ -27,9 +30,11 @@ namespace Mangos
         {
             rigi = GetComponent<Rigidbody>();
 			cam = Camera.main;
+            anim = GetComponentInChildren<Animator>();
 			scaler = new Vector3 (1, 0, 1);
 	        lookDir = rigi.velocity;
 	        m_angle = 0;
+            canMove = true;
         }
 
         // Update is called once per frame
@@ -39,8 +44,9 @@ namespace Mangos
         }
 
         public void Move(float xAxis, float yAxis)
-	    {            
-        	
+	    {
+            if (!canMove)
+                return;
 			//Movement
 		    dir = Vector3.Scale (cam.transform.forward, scaler).normalized * yAxis + Vector3.Scale(cam.transform.right, scaler).normalized * xAxis;
 		    float dotProduct = Vector3.Dot(rigi.velocity.normalized, dir.normalized);
@@ -51,6 +57,29 @@ namespace Mangos
 			if (rigi.velocity != Vector3.zero) {
 				transform.LookAt (transform.position + lookDir.normalized);
 			}
+
+            //Animacion
+            if (rigi.velocity == Vector3.zero)
+                anim.SetBool("IsMoving", false);
+            else
+                anim.SetBool("IsMoving", true);
         }
+
+        public void onActionDown()
+        {
+            if (holdingItem)
+                anim.SetTrigger("Throw");
+            else
+                anim.SetTrigger("Pickup");
+        }
+
+        public void onDashDown()
+        {
+            anim.SetTrigger("Dash");
+        }
+
+        public void setCanMove(bool b){ canMove = b; }
+
+        public void setHoldingItem(bool b) { holdingItem = b; }
     }
 }
