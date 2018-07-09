@@ -11,10 +11,13 @@ namespace Mangos {
 			
 		void Update(){
 			switch (StaticManager.gameManager.gameState) {
-			case GameState.mainGame:
+                case GameState.mainMenu:
 
-			default:
-				break;
+                    break;
+                case GameState.mainGame:
+                    StaticManager.playerController.Move(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+				    break;
+                
 			}
 		}
 	}
