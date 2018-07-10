@@ -7,6 +7,7 @@ namespace Mangos {
 
         KeyCode attack = KeyCode.J;
         KeyCode dash = KeyCode.K;
+        KeyCode interact = KeyCode.U;
 
 		void Awake(){
 			StaticManager.inputManager = this;
@@ -23,6 +24,8 @@ namespace Mangos {
                         StaticManager.playerController.onActionDown();
                     if (Input.GetKeyDown(dash))
                         StaticManager.playerController.onDashDown();
+                    if (Input.GetKeyDown(interact))
+                        StaticManager.playerController.onInteractDown();
 				    break;
                 
 			}

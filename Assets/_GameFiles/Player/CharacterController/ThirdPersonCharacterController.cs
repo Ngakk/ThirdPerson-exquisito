@@ -4,12 +4,14 @@ using UnityEngine;
 
 namespace Mangos
 {
+    //TODO: hacer que entre a use, y de una vez unos ejemplos de items
     [RequireComponent(typeof(Rigidbody))]
     public class ThirdPersonCharacterController : MangosBehaviour
     {
 		Rigidbody rigi;
 		Camera cam;
         Animator anim;
+        GameObject interactuable;
 		[HideInInspector]
 		public Vector3 dir, lookDir;
 		Vector3 scaler;
@@ -17,8 +19,10 @@ namespace Mangos
 		[Range(0, 1)]
 	    public float rotationSpeed;
 	    public float m_angle;
+
         private bool canMove;
         private bool holdingItem;
+        private bool canInteract;
 
         private void Awake()
         {
@@ -46,7 +50,11 @@ namespace Mangos
         public void Move(float xAxis, float yAxis)
 	    {
             if (!canMove)
+            {
+                rigi.velocity = Vector3.Scale(rigi.velocity, new Vector3(0, 1, 0));
                 return;
+            }
+
 			//Movement
 		    dir = Vector3.Scale (cam.transform.forward, scaler).normalized * yAxis + Vector3.Scale(cam.transform.right, scaler).normalized * xAxis;
 		    float dotProduct = Vector3.Dot(rigi.velocity.normalized, dir.normalized);
@@ -67,10 +75,7 @@ namespace Mangos
 
         public void onActionDown()
         {
-            if (holdingItem)
-                anim.SetTrigger("Throw");
-            else
-                anim.SetTrigger("Pickup");
+            
         }
 
         public void onDashDown()
@@ -78,8 +83,51 @@ namespace Mangos
             anim.SetTrigger("Dash");
         }
 
+        public void onInteractDown()
+        {
+            if (interactuable != null)
+            {
+                Interactuable temp = interactuable.GetComponent<Interactuable>();
+                switch (temp.actionType)
+                {
+                    case ActionId.pickup:
+                        anim.SetTrigger("Interact");
+                        anim.SetInteger("HoldId", (int)temp.holdId);
+                        break;
+                    case ActionId.pocket:
+
+                        break;
+                    case ActionId.use:
+
+                        break;
+                }
+                temp.OnInteract();
+            }
+        }
+
         public void setCanMove(bool b){ canMove = b; }
 
         public void setHoldingItem(bool b) { holdingItem = b; }
+
+        private void setInteractuable(GameObject go)
+        {
+            if (interactuable == null)
+                interactuable = go;
+            else if ((gameObject.transform.position - interactuable.transform.position).magnitude > (gameObject.transform.position - go.transform.position).magnitude)
+	            interactuable = go;
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            if (other.CompareTag("Interactuable"))
+                setInteractuable(other.gameObject);
+            
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("Interactuable"))
+                interactuable = null;
+        }
     }
 }

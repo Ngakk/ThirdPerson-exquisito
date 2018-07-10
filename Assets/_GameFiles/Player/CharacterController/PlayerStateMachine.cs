@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace Mangos
 {
@@ -8,31 +9,41 @@ namespace Mangos
     {
         override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            if (stateInfo.IsName("Pickup"))
+            /*if (stateInfo.IsName("PickUp"))
             {
-                StaticManager.playerController.setCanMove(false);
-            }
+	            StaticManager.playerController.setCanMove(false);
+            }*/
 
-            if (stateInfo.IsName("throw"))
-            {
-                //TODO: que agarre bien el throw
-                Debug.Log("throw");
-                StaticManager.playerController.setHoldingItem(false);
-            }
+            
         }
 
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            if (stateInfo.IsName("Pickup"))
+            
+        }
+
+        public override void OnStateMachineEnter(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller)
+        {
+            if(stateMachinePathHash == Animator.StringToHash("Base Layer.Interact"))
             {
-                StaticManager.playerController.setCanMove(true);
-                StaticManager.playerController.setHoldingItem(true);
+                StaticManager.playerController.setCanMove(false);
+                animator.SetTrigger("ExitHold");
+            }
+
+            if (stateMachinePathHash == Animator.StringToHash("Base Layer.Idles"))
+            {
+                animator.SetInteger("IdleId", Random.Range(0, 4));
+                Debug.Log("idles");
             }
         }
 
-        override public void OnStateMachineEnter(Animator animator, int stateMachinePathHash)
+        public override void OnStateMachineExit(Animator animator, int stateMachinePathHash)
         {
-            animator.SetInteger("IdleId", Random.Range(0, 4));
+            if (stateMachinePathHash == Animator.StringToHash("Base Layer.Interact"))
+            {
+                animator.SetTrigger("EnterHold");
+                StaticManager.playerController.setCanMove(true);
+            }
         }
     }
 }
