@@ -32,6 +32,16 @@ namespace Mangos
 			}
 		}
 		
+		void OnCollisionEnter(Collision _col)
+		{
+			if(_col.collider.CompareTag("Player"))
+			{
+				print("Colisione");
+				
+				gameObject.SetActive(false);
+			}
+		}
+		
 		public void CambiarDireccion()
 		{
 			rigi.velocity = -rigi.velocity;
