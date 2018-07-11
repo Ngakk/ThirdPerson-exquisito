@@ -43,13 +43,12 @@ namespace Mangos
                 currentX += Input.GetAxis("Mouse X");
                 currentY += Input.GetAxis("Mouse Y");
             }
-
             currentY = Mathf.Clamp(currentY, Y_ANGLE_MIN, Y_ANGLE_MAX);
         }
 
         void FixedUpdate()
         {
-
+            
         }
 
         void LateUpdate()
