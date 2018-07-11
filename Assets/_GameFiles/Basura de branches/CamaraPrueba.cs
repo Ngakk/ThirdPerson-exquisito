@@ -27,7 +27,7 @@ public class CamaraPrueba : MonoBehaviour {
 
     void MoveToTarget()
     {
-        destination = charController.TargetRotation * offsetFromTarget;
+        //destination = charController.TargetRotation * offsetFromTarget;
         destination += target.position;
         transform.position = destination;
     }
