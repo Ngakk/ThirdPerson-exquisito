@@ -36,7 +36,6 @@ namespace Mangos
 		{
 			if(_col.collider.CompareTag("Player"))
 			{
-				print("Colisione");
 				
 				gameObject.SetActive(false);
 			}

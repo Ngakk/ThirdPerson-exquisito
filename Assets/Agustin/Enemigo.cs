@@ -7,8 +7,13 @@ namespace Mangos
 
 	public class Enemigo : MangosBehaviour
 	{
-		float disparo = 1.0f;
-		float delay;
+		float delay = 1.0f;
+		
+		float delay_triple = 0.5f;
+		
+		int contador = 0;
+		
+		float hp = 100.0f;
 		
 		// Pool Bala
 		List<GameObject> Bala = new List<GameObject>();
@@ -36,7 +41,7 @@ namespace Mangos
 		// Use this for initialization
 		void Start () 
 		{
-			delay = disparo;
+			delay = 1.0f;
 		}
 		
 		// Update is called once per frame
@@ -44,13 +49,55 @@ namespace Mangos
 		{
 			delay -= Time.deltaTime;
 			
+			hp -= Time.deltaTime;
+			
+			if(hp > 75 && hp <= 100)
+			{
+				Disparo();
+			}
+			
+			if(hp > 50 && hp <= 75)
+			{
+				if(delay <= 0.0f)
+				{
+					delay_triple -= Time.deltaTime;
+					
+					if(delay_triple <= 0)
+					{
+						Disparo();
+						
+						contador++;
+						
+						delay_triple = 0.5f;
+						
+						if(contador == 3)
+						{
+							delay_triple = 0.5f;
+							
+							delay = 1.0f;
+							
+							contador = 0;
+						}
+					}
+				}
+			}
+		}
+		
+		void OnCollisionEnter(Collision _col)
+		{
+			/*if(_col.collider.CompareTag("Bala_Player"))
+			{
+				print("Recibi daño");
+			}*/
+		}
+		
+		void Disparo()
+		{
 			if(delay <= 0.0f)
 			{
 				GameObject go = Generar_Bala();
-				
+			
 				go.GetComponent<Rigidbody>().AddForce(transform.forward * 500);
-				
-				delay = disparo;
 			}
 		}
 	}
