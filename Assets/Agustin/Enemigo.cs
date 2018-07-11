@@ -51,12 +51,17 @@ namespace Mangos
 			
 			hp -= Time.deltaTime;
 			
-			if(hp > 75 && hp <= 100)
+			if(hp > 75.0f && hp <= 100.0f)
 			{
-				Disparo();
+				if(delay <= 0.0f)
+				{
+					Disparo();
+					
+					delay = 1.0f;
+				}
 			}
 			
-			if(hp > 50 && hp <= 75)
+			if(hp > 50.0f && hp <= 75.0f)
 			{
 				if(delay <= 0.0f)
 				{
@@ -81,6 +86,16 @@ namespace Mangos
 					}
 				}
 			}
+			
+			if(hp > 25.0f && hp <= 50.0f)
+			{
+				
+			}
+			
+			if(hp > 0.0f && hp <= 25.0f)
+			{
+				
+			}
 		}
 		
 		void OnCollisionEnter(Collision _col)
@@ -93,12 +108,9 @@ namespace Mangos
 		
 		void Disparo()
 		{
-			if(delay <= 0.0f)
-			{
-				GameObject go = Generar_Bala();
-			
-				go.GetComponent<Rigidbody>().AddForce(transform.forward * 500);
-			}
+			GameObject go = Generar_Bala();
+		
+			go.GetComponent<Rigidbody>().AddForce(transform.forward * 500);
 		}
 	}
 }

@@ -6,9 +6,7 @@ namespace Mangos
 {
 	public class Bala_Enemiga : MangosBehaviour 
 	{
-		
-		float tiempo = 5.0f;
-		float delay;
+		float delay = 5.0f;
 		
 		Rigidbody rigi;
 	
@@ -16,7 +14,7 @@ namespace Mangos
 		void Start () 
 		{
 			rigi = gameObject.GetComponent<Rigidbody>();
-			delay = tiempo;
+			delay = 5.0f;
 		}
 		
 		// Update is called once per frame
@@ -28,7 +26,7 @@ namespace Mangos
 			{
 				gameObject.SetActive(false);
 				
-				delay = tiempo;
+				delay = 5.0f;
 			}
 		}
 		
