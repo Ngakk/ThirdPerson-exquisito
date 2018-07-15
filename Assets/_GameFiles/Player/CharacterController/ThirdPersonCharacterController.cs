@@ -52,6 +52,7 @@ namespace Mangos
             if (!canMove)
             {
                 rigi.velocity = Vector3.Scale(rigi.velocity, new Vector3(0, 1, 0));
+                anim.SetBool("IsMoving", false);
                 return;
             }
 
