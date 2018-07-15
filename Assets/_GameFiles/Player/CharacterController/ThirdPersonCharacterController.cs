@@ -12,6 +12,8 @@ namespace Mangos
 		Camera cam;
         Animator anim;
         GameObject interactuable;
+        WeaponManager weaponManager;
+        public Transform rightHand, leftHand;
 		[HideInInspector]
 		public Vector3 dir, lookDir;
 		Vector3 scaler;
@@ -35,13 +37,13 @@ namespace Mangos
             rigi = GetComponent<Rigidbody>();
 			cam = Camera.main;
             anim = GetComponentInChildren<Animator>();
+            weaponManager = GetComponent<WeaponManager>();
 			scaler = new Vector3 (1, 0, 1);
 	        lookDir = rigi.velocity;
 	        m_angle = 0;
             canMove = true;
         }
 
-        // Update is called once per frame
         void Update()
         {
 
@@ -58,7 +60,6 @@ namespace Mangos
 
 			//Movement
 		    dir = Vector3.Scale (cam.transform.forward, scaler).normalized * yAxis + Vector3.Scale(cam.transform.right, scaler).normalized * xAxis;
-		    float dotProduct = Vector3.Dot(rigi.velocity.normalized, dir.normalized);
 			rigi.velocity = speed * dir.normalized;
 
 		    //Rotation
@@ -89,20 +90,23 @@ namespace Mangos
             if (interactuable != null)
             {
                 Interactuable temp = interactuable.GetComponent<Interactuable>();
-                switch (temp.actionType)
+                if (temp.checkRequisite())
                 {
-                    case ActionId.pickup:
-                        anim.SetTrigger("Interact");
-                        anim.SetInteger("HoldId", (int)temp.holdId);
-                        break;
-                    case ActionId.pocket:
+                    switch (temp.actionType)
+                    {
+                        case ActionId.pickup:
+                            anim.SetTrigger("Interact");
+                            anim.SetInteger("HoldId", (int)temp.holdId);
+                            break;
+                        case ActionId.pocket:
 
-                        break;
-                    case ActionId.use:
+                            break;
+                        case ActionId.use:
 
-                        break;
+                            break;
+                    }
+                    temp.OnInteract();
                 }
-                temp.OnInteract();
             }
         }
 
@@ -130,5 +134,46 @@ namespace Mangos
             if (other.CompareTag("Interactuable"))
                 interactuable = null;
         }
-    }
+
+        public void pickItUp()
+        {
+            if(interactuable != null)
+            {
+                Interactuable temp = interactuable.GetComponent<Interactuable>();
+                switch (temp.actionType)
+                {
+                    case ActionId.pickup:
+                        weaponManager.setWeapon(interactuable);
+                        takeWeaponInHands();
+                        break;
+                    case ActionId.pocket:
+                        break;
+                    case ActionId.use:
+                        break;
+                }
+            }
+        }
+
+        public void takeWeaponInHands()
+        {
+            Debug.Log("weapon taken");
+            if(interactuable.GetComponent<Weapon>() != null)
+            {
+                Weapon tempW = interactuable.GetComponent<Weapon>();
+                if((int)tempW.GetHoldId() <= 3)
+                {
+                    interactuable.transform.parent = rightHand;
+                }
+                else
+                {
+                    interactuable.transform.parent = leftHand;
+                }
+
+                interactuable.transform.localRotation = Quaternion.Euler(0, 0, 0);
+                interactuable.transform.localPosition = -tempW.handle.localPosition;
+
+            }
+            
+        }
+    } 
 }
