@@ -29,5 +29,10 @@ namespace Mangos
             return (int)holdId;
         }
 
+        public virtual void OnUse() { }
+
+        public virtual bool checkRequisite(){
+            return true;
+        }
     }
 }
