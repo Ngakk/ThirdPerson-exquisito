@@ -9,11 +9,18 @@ public class CamaraPrueba : MonoBehaviour {
     public class PositionSettings
     {
         public Vector3 targetPosOffset = new Vector3(0, 3.4f, 0);
-        public float lookSmooth = 100f;
         public float distanceFromTarget = -8;
         public float zoomSmooth = 10;
+        public float zoomStep = 2;
         public float maxZoom = -2;
         public float minZoom = -15;
+        public bool smoothFollow = true;
+        public float smoot = 0.05f;
+
+        [HideInInspector]
+        public float newDistance = -8;
+        [HideInInspector]
+        public float adjustmentDistance = -8;
     }
 
     [System.Serializable]
@@ -21,8 +28,8 @@ public class CamaraPrueba : MonoBehaviour {
     {
         public float xRotation = -20;
         public float yRotation = -180;
-        public float maxXRotation = 25;
-        public float minXRotation = -85;
+        public float maxXRotation = 15;
+        public float minXRotation = -55;
         public float vOrbitSmooth = 150;
         public float hOrbitSmooth = 150;
     }
@@ -31,8 +38,8 @@ public class CamaraPrueba : MonoBehaviour {
     public class InputSettings
     {
         public string Snap = "Snap";
-        public string cam_Horizontal = "cam_horizontal";
-        public string cam_Vertical = "cam_vertical";
+        public string cam_Horizontal = "camHorizontal";
+        public string cam_Vertical = "camVertical";
         public string zoom = "zoom";
     }
 
@@ -71,7 +78,7 @@ public class CamaraPrueba : MonoBehaviour {
     void MoveToTarget()
     {
         targetPos = target.position + position.targetPosOffset;
-        destination = Quaternion.Euler(orbit.xRotation, orbit.yRotation, 0) * -Vector3.forward * position.distanceFromTarget;
+        destination = Quaternion.Euler(orbit.xRotation, orbit.yRotation + target.eulerAngles.y, 0) * -Vector3.forward * position.distanceFromTarget;
         destination += target.position;
         transform.position = destination;
     }
@@ -94,10 +101,10 @@ public class CamaraPrueba : MonoBehaviour {
     
     void GetInput()
     {
-        vOrbitInput = Input.GetAxis(input.cam_Vertical);
-        hOrbitInput = Input.GetAxis(input.cam_Horizontal);
-        hOrbitSnapInput = Input.GetAxis(input.Snap);
-        zoomInput = Input.GetAxis(input.zoom);
+        vOrbitInput = Input.GetAxis("camVertical");
+        hOrbitInput = Input.GetAxis("camHorizontal");
+        hOrbitSnapInput = Input.GetAxis("Snap");
+        zoomInput = Input.GetAxis("zoom");
     }
 
     void OrbitTarget()
@@ -110,10 +117,26 @@ public class CamaraPrueba : MonoBehaviour {
         orbit.xRotation += -vOrbitInput * orbit.vOrbitSmooth * Time.deltaTime;
         orbit.yRotation += -hOrbitInput * orbit.hOrbitSmooth * Time.deltaTime;
 
+        if(orbit.xRotation > orbit.maxXRotation)
+        {
+            orbit.xRotation = orbit.maxXRotation;
+        }
+        if(orbit.xRotation < orbit.minXRotation)
+        {
+            orbit.xRotation = orbit.minXRotation;
+        }
     }
 
     void ZoomInOnTarget()
     {
-
+        position.distanceFromTarget += zoomInput * position.zoomSmooth * Time.deltaTime;
+        if(position.distanceFromTarget > position.maxZoom)
+        {
+            position.distanceFromTarget = position.maxZoom;
+        }
+        if(position.distanceFromTarget < position.minZoom)
+        {
+            position.distanceFromTarget = position.minZoom;
+        }
     }
 }
