@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace Mangos
 {
-
 	public class Enemigo : MangosBehaviour
 	{
+		public Vector3 Velocidad;
+		
 		float delay = 1.0f;
 		
 		float delay_triple = 0.5f;
@@ -14,6 +15,10 @@ namespace Mangos
 		int contador = 0;
 		
 		float hp = 100.0f;
+		
+		public Animator anim;
+		
+		bool Steps = false;
 		
 		// Pool Bala
 		List<GameObject> Bala = new List<GameObject>();
@@ -96,12 +101,23 @@ namespace Mangos
 			{
 				
 			}
+			
+			if(Input.GetKeyDown(KeyCode.Space))
+			{
+				anim.SetBool("Steps", !Steps);
+			}
+			
+			if(Steps == true)
+			{
+				gameObject.transform.Translate(Velocidad * Time.deltaTime);
+			}
 		}
 		
 		void OnCollisionEnter(Collision _col)
 		{
 			/*if(_col.collider.CompareTag("Bala_Player"))
 			{
+			StartCoroutine("DamageStop");
 				print("Recibi daño");
 			}*/
 		}
@@ -112,5 +128,21 @@ namespace Mangos
 		
 			go.GetComponent<Rigidbody>().AddForce(transform.forward * 500);
 		}
+		
+		/*IEnumerator DamageStop()
+		{
+			vulnerable = false;
+			claw.GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.white);
+			float startTime = Time.time;
+			
+			while (Time.time < startTime +invulnerableTime) 
+			{
+				claw.gameObject.GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.Lerp(Color.white, Color.black, Mathf.InverseLerp(startTime, startTime+invulnerableTime, Time.time) ));
+				yield return null;
+			}
+			
+			claw.gameObject.GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.black);
+			vulnerable = true;
+		}*/
 	}
 }

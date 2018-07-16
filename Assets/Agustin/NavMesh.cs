@@ -49,12 +49,15 @@ public class NavMesh : MonoBehaviour {
 			
 			if(delay <= 0.0f)
 			{
-				GameObject go = Generar_Bala();
-				
-				go.GetComponent<Rigidbody>().AddForce(transform.forward * 500);
-				
-				delay = 1.0f;
+				Disparo();
 			}
 		}
+	}
+	
+	void Disparo()
+	{
+		GameObject go = Generar_Bala();
+		
+		go.GetComponent<Rigidbody>().AddForce(transform.forward * 500);
 	}
 }
