@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Mangos {
+    //Meta
 	public enum GameState {
 		mainMenu,
 		mainGame,
@@ -14,16 +15,38 @@ namespace Mangos {
 		loading
 	}
 	
-	public enum Weapon{
-		sword
+    //Game
+	public enum HitType{
+		edgeSlice,
+        lightStrike,
+        heavyStrike
 	}
 
+    public enum ObjectHoldId : int
+    {
+        nothing,
+        gloves,
+        oneHand,
+        oneHandHeavy,
+        twoHand,
+        twoHandHeavy,
+        twoHandOverhead
+    }
+
+    public enum ActionId : int
+    {
+        pocket,
+        pickup,
+        use
+    }
+
+    //Data carriers
 	public struct HitData{
-		public Weapon weapon;
-		public Vector3 shooterPos;
+		public HitType hitType;
+		public Vector3 hitterPos;
 		public Vector3 hitPos;
+        public Vector3 hitForceDir;
 		public float power;
-		public RaycastHit rayHit;
 	}
 
     public class StaticManager

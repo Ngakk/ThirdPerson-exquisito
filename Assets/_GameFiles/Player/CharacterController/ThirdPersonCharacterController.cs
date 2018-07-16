@@ -4,12 +4,16 @@ using UnityEngine;
 
 namespace Mangos
 {
+    //TODO: hacer que entre a use, y de una vez unos ejemplos de items
     [RequireComponent(typeof(Rigidbody))]
     public class ThirdPersonCharacterController : MangosBehaviour
     {
 		Rigidbody rigi;
 		Camera cam;
         Animator anim;
+        GameObject interactuable;
+        WeaponManager weaponManager;
+        public Transform rightHand, leftHand;
 		[HideInInspector]
 		public Vector3 dir, lookDir;
 		Vector3 scaler;
@@ -17,8 +21,10 @@ namespace Mangos
 		[Range(0, 1)]
 	    public float rotationSpeed;
 	    public float m_angle;
+
         private bool canMove;
         private bool holdingItem;
+        private bool canInteract;
 
         private void Awake()
         {
@@ -31,13 +37,13 @@ namespace Mangos
             rigi = GetComponent<Rigidbody>();
 			cam = Camera.main;
             anim = GetComponentInChildren<Animator>();
+            weaponManager = GetComponent<WeaponManager>();
 			scaler = new Vector3 (1, 0, 1);
 	        lookDir = rigi.velocity;
 	        m_angle = 0;
             canMove = true;
         }
 
-        // Update is called once per frame
         void Update()
         {
 
@@ -46,10 +52,14 @@ namespace Mangos
         public void Move(float xAxis, float yAxis)
 	    {
             if (!canMove)
+            {
+                rigi.velocity = Vector3.Scale(rigi.velocity, new Vector3(0, 1, 0));
+                anim.SetBool("IsMoving", false);
                 return;
+            }
+
 			//Movement
 		    dir = Vector3.Scale (cam.transform.forward, scaler).normalized * yAxis + Vector3.Scale(cam.transform.right, scaler).normalized * xAxis;
-		    float dotProduct = Vector3.Dot(rigi.velocity.normalized, dir.normalized);
 			rigi.velocity = speed * dir.normalized;
 
 		    //Rotation
@@ -67,10 +77,7 @@ namespace Mangos
 
         public void onActionDown()
         {
-            if (holdingItem)
-                anim.SetTrigger("Throw");
-            else
-                anim.SetTrigger("Pickup");
+            
         }
 
         public void onDashDown()
@@ -78,8 +85,95 @@ namespace Mangos
             anim.SetTrigger("Dash");
         }
 
+        public void onInteractDown()
+        {
+            if (interactuable != null)
+            {
+                Interactuable temp = interactuable.GetComponent<Interactuable>();
+                if (temp.checkRequisite())
+                {
+                    switch (temp.actionType)
+                    {
+                        case ActionId.pickup:
+                            anim.SetTrigger("Interact");
+                            anim.SetInteger("HoldId", (int)temp.holdId);
+                            break;
+                        case ActionId.pocket:
+
+                            break;
+                        case ActionId.use:
+
+                            break;
+                    }
+                    temp.OnInteract();
+                }
+            }
+        }
+
         public void setCanMove(bool b){ canMove = b; }
 
         public void setHoldingItem(bool b) { holdingItem = b; }
-    }
+
+        private void setInteractuable(GameObject go)
+        {
+            if (interactuable == null)
+                interactuable = go;
+            else if ((gameObject.transform.position - interactuable.transform.position).magnitude > (gameObject.transform.position - go.transform.position).magnitude)
+	            interactuable = go;
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            if (other.CompareTag("Interactuable"))
+                setInteractuable(other.gameObject);
+            
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("Interactuable"))
+                interactuable = null;
+        }
+
+        public void pickItUp()
+        {
+            if(interactuable != null)
+            {
+                Interactuable temp = interactuable.GetComponent<Interactuable>();
+                switch (temp.actionType)
+                {
+                    case ActionId.pickup:
+                        weaponManager.setWeapon(interactuable);
+                        takeWeaponInHands();
+                        break;
+                    case ActionId.pocket:
+                        break;
+                    case ActionId.use:
+                        break;
+                }
+            }
+        }
+
+        public void takeWeaponInHands()
+        {
+            Debug.Log("weapon taken");
+            if(interactuable.GetComponent<Weapon>() != null)
+            {
+                Weapon tempW = interactuable.GetComponent<Weapon>();
+                if((int)tempW.GetHoldId() <= 3)
+                {
+                    interactuable.transform.parent = rightHand;
+                }
+                else
+                {
+                    interactuable.transform.parent = leftHand;
+                }
+
+                interactuable.transform.localRotation = Quaternion.Euler(0, 0, 0);
+                interactuable.transform.localPosition = -tempW.handle.localPosition;
+
+            }
+            
+        }
+    } 
 }
