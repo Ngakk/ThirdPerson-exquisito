@@ -77,7 +77,7 @@ namespace Mangos
 
         public void onActionDown()
         {
-            
+            anim.SetTrigger("Use");
         }
 
         public void onDashDown()
@@ -169,8 +169,8 @@ namespace Mangos
                     interactuable.transform.parent = leftHand;
                 }
 
-                interactuable.transform.localRotation = Quaternion.Euler(0, 0, 0);
-                interactuable.transform.localPosition = -tempW.handle.localPosition;
+                interactuable.transform.localRotation = Quaternion.identity;
+                interactuable.transform.localPosition = Vector3.zero;
 
             }
             

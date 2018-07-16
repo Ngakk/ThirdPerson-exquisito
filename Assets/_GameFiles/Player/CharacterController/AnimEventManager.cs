@@ -1,11 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Mangos
 {
     public class AnimEventManager : MangosBehaviour
-    {
+	{
+    	
+		public UnityEvent[] eventToCall;
+		
         WeaponManager weaponManager;
         ThirdPersonCharacterController playerController;
         // Use this for initialization
@@ -20,10 +24,10 @@ namespace Mangos
         {
 
         }
-
-        public void pickItUp()
-        {
-            playerController.pickItUp();
-        }
+        
+		public void CallEventIndex(int eventID)
+		{
+			eventToCall[eventID].Invoke();
+		}
     }
 }

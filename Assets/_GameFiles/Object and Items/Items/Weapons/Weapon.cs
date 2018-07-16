@@ -6,8 +6,6 @@ namespace Mangos
 {
     public class Weapon : Interactuable
     {
-        public Transform handle;
-
         public override void OnUse()
         {
             base.OnUse();
