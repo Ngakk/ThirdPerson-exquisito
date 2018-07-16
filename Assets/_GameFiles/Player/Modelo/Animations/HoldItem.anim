@@ -92,7 +92,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/SingleHand
+    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/RightHand
   m_PositionCurves: []
   m_ScaleCurves: []
   m_FloatCurves: []
@@ -133,7 +133,7 @@ AnimationClip:
       customType: 4
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 1706586454
+      path: 644751425
       attribute: 4
       script: {fileID: 0}
       typeID: 4
@@ -405,7 +405,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/SingleHand
+    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/RightHand
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -424,7 +424,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/SingleHand
+    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/RightHand
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -443,7 +443,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/SingleHand
+    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/RightHand
     classID: 4
     script: {fileID: 0}
   m_EulerEditorCurves:
@@ -574,7 +574,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/SingleHand
+    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/RightHand
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -584,7 +584,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/SingleHand
+    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/RightHand
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -594,7 +594,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/SingleHand
+    path: Sphere006/Box001/Sphere003/Cylinder002/Sphere002/Cylinder004/RightHand
     classID: 4
     script: {fileID: 0}
   m_HasGenericRootTransform: 0
