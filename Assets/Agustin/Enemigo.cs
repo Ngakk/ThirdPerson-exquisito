@@ -8,6 +8,8 @@ namespace Mangos
 	{
 		public Vector3 Velocidad;
 		
+		Rigidbody rigi;
+		
 		float delay = 1.0f;
 		
 		float delay_triple = 0.5f;
@@ -47,6 +49,8 @@ namespace Mangos
 		void Start () 
 		{
 			delay = 1.0f;
+			
+			rigi = gameObject.GetComponent<Rigidbody>();
 		}
 		
 		// Update is called once per frame
@@ -100,16 +104,6 @@ namespace Mangos
 			if(hp > 0.0f && hp <= 25.0f)
 			{
 				
-			}
-			
-			if(Input.GetKeyDown(KeyCode.Space))
-			{
-				anim.SetBool("Steps", !Steps);
-			}
-			
-			if(Steps == true)
-			{
-				gameObject.transform.Translate(Velocidad * Time.deltaTime);
 			}
 		}
 		

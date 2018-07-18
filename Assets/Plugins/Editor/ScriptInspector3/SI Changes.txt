@@ -1,24 +1,62 @@
 -------------------------------------
 SCRIPT INSPECTOR 3
-version 3.0.18, May 2017
-Copyright © 2012-2017, Flipbook Games
+version 3.0.21, February 2018
+Copyright © 2012-2018, Flipbook Games
 -------------------------------------
 
 
 Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text, now transformed into an advanced C# IDE!!!
 
 
-IMPORTANT NOTE to all OS X users with Unity 5 Personal or Professional and Unity 4 Pro:
+IMPORTANT NOTE to all OS X users with Unity 2017.x and 5.x Personal or Professional, and Unity 4.x Pro:
+
 You may want to extend Si3's functionality with @inventor2010's amazing free plugin posted here:
 	http://forum.unity3d.com/threads/script-inspector-3.195218/page-13#post-2226154
-or even better, the updated version posted here:
+
+The plugin allows handling of Cmd-S, Cmd-Z, and Shift-Cmd-Z in Unity on OS X for more natural shortcuts for Save, Undo, and Redo operations in Si3!
+
+WARNING: Please, DO NOT USE the updated version of that plugin posted here:
 	http://forum.unity3d.com/threads/script-inspector-3.195218/page-20#post-2414302
-The plugin allows handling Cmd-S, Cmd-Z, and Shift-Cmd-Z in Unity on OS X for more natural shortcuts for Save, Undo, and Redo operations in Si3!
+
 Thank you @inventor2010 for being awesome!!! :)
 
 
 Script Inspector 3 - Version History
 =====================================
+
+New in version 3.0.21:
+- Added full support for the new Assembly Definitions in Unity 2017.3 - thanks @sngdan and @Zbad
+- Added support for #define symbols in .rsp files - thanks @_Adriaan
+- Added option to use monospaced font in Console - thanks Arisha
+- New shortcut: Shift+Enter inserts a new line below and moves the cursor there - thanks @Zahorodnii
+- New shortcut: Escape key in Find Results and References tabs goes back to the last SI tab
+- Disabled auto-indentation of preprocessor directives
+- Fixed exception on finding references to methods - thanks @Zbad
+- Fixed resolving inherited members from constructed base types - thanks @SweatyChair
+- Fixed accepting autocomplete with Tab key when Insert Spaces on Tab Key option is turned on - thanks @tosiabunio
+- Fixed positioning in Unity 2017+ after toggling floating tabs - thanks https://twitter.com/loolo78
+- Fixed color themes in Unity 2018.1 Beta - thanks @Xype and @zephyr7
+- Fixed positioning of Find Results, Replace and References tabs
+- Fixed an error on closing Si3 popup windows in recent Unity versions
+
+New in version 3.0.20:
+- Added option to insert Spaces instead of Tabs
+- Fixed auto-indenting comments on Paste - thanks @jrDev
+- Fixed position of SI Console Auto-focus button in Unity 2017.x
+- Fixed deprecated field compile warning in Unity 2017.2
+
+New in version 3.0.19:
+- Massive improvements in resolving generics, extension methods, method overloads, and implicitly typed lambda parameters!
+- Added Ctrl+Period as an alternative shortcut for Code Fixes on OS X
+- Toggle Floating Tabs command now first sets the focus on those tabs, then hides them, and then shows them - thanks @mStep
+- Unity 2017.x compatibility - thanks @Andrew_Howe & @sxa
+- Tweaked reference highlighting colors in Darcula theme - thanks @roberto_sc
+- Fixed building list of referenced assemblies - thanks @Slaye & @sngdan
+- Fixed evaluation of some #elif and #else preprocessor blocks - thanks @_Adriaan
+- Fixed using-alias types of generic types - thanks @thienhaflash
+- Fixed resolving nested method invocation expressions
+- Fixed NRE on opening scripts from some other plugins
+- Unity 4.0.0 backward compatibility
 
 New in version 3.0.18:
 - Critical fix for "Multiple Managers" error - thanks @ramroom4444

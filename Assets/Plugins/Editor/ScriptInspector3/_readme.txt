@@ -1,19 +1,23 @@
 -------------------------------------
 SCRIPT INSPECTOR 3
-version 3.0.18, May 2017
-Copyright © 2012-2017, Flipbook Games
+version 3.0.21, February 2018
+Copyright © 2012-2018, Flipbook Games
 -------------------------------------
 
 
 Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text, now transformed into an advanced C# IDE!!!
 
 
-IMPORTANT NOTE to all OS X users with Unity 5 Personal or Professional and Unity 4 Pro:
+IMPORTANT NOTE to all OS X users with Unity 2017.x and 5.x Personal or Professional, and Unity 4.x Pro:
+
 You may want to extend Si3's functionality with @inventor2010's amazing free plugin posted here:
 	http://forum.unity3d.com/threads/script-inspector-3.195218/page-13#post-2226154
-or even better, the updated version posted here:
+
+The plugin allows handling of Cmd-S, Cmd-Z, and Shift-Cmd-Z in Unity on OS X for more natural shortcuts for Save, Undo, and Redo operations in Si3!
+
+WARNING: Please, DO NOT USE the updated version of that plugin posted here:
 	http://forum.unity3d.com/threads/script-inspector-3.195218/page-20#post-2414302
-The plugin allows handling Cmd-S, Cmd-Z, and Shift-Cmd-Z in Unity on OS X for more natural shortcuts for Save, Undo, and Redo operations in Si3!
+
 Thank you @inventor2010 for being awesome!!! :)
 
 

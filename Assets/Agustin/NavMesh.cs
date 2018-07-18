@@ -7,8 +7,17 @@ public class NavMesh : MonoBehaviour {
 	
 	public NavMeshAgent nav;
 	public Transform Obj;
+	public Animator anim;
 	
 	float delay = 1.0f;
+	
+	float delay_triple = 0.5f;
+		
+	int contador = 0;
+	
+	Vector3 PosActual;
+	
+	float hp;
 	
 	// Pool Bala
 	List<GameObject> Bala = new List<GameObject>();
@@ -35,7 +44,9 @@ public class NavMesh : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
+		PosActual = gameObject.transform.position;
 		delay = 1.0f;
+		hp = 100.0f;
 	}
 	
 	// Update is called once per frame
@@ -43,15 +54,67 @@ public class NavMesh : MonoBehaviour {
 	{
 		nav.SetDestination(Obj.position);
 		
-		if(nav.speed == 0)
+		if(hp <= 0.0f)
 		{
+			gameObject.SetActive(false);
+		}
+		
+		if(PosActual != transform.position)
+		{
+			anim.SetBool("Steps", true);
+		}
+		else
+		{
+			anim.SetBool("Steps", false);
+			
 			delay -= Time.deltaTime;
 			
-			if(delay <= 0.0f)
+			if(hp > 75 && hp <= 100)
 			{
-				Disparo();
+				if(delay <= 0.0f)
+				{
+					Disparo();
+				
+					delay = 1.0f;
+				}
+			}
+			else if(hp > 50.0f && hp <= 75.0f)
+			{
+				if(delay <= 0.0f)
+				{
+					delay_triple -= Time.deltaTime;
+					
+					if(delay_triple <= 0)
+					{
+						Disparo();
+						
+						contador++;
+						
+						delay_triple = 0.5f;
+						
+						if(contador == 3)
+						{
+							delay_triple = 0.5f;
+							
+							delay = 1.0f;
+							
+							contador = 0;
+						}
+					}
+				}
+			}
+			else if(hp > 25.0f && hp <= 50.0f)
+			{
+				
+			}
+			
+			else if(hp > 0.0f && hp <= 25.0f)
+			{
+				
 			}
 		}
+		
+		PosActual = transform.position;
 	}
 	
 	void Disparo()

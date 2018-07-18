@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -138,6 +138,7 @@ public static class SISettings
 	public static BoolOption useStandardColorInPopups = Create("UseStdColorsInPopups", false);
 	public static BoolOption showThickerCaret = Create("ShowThickerCaret", false);
 	public static IntOption autoFocusConsole = Create("AutoFocusConsole", 0);
+	public static BoolOption monospacedFontConsole = Create("MonospacedFontConsole", false);
 	
 	public static BoolOption handleOpenAssets = Create("HandleOpenAsset", false);
 	public static BoolOption dontOpenAssets = Create("dontOpenAsset", false);
@@ -184,7 +185,7 @@ public static class SISettings
 	public static BoolOption copyCutFullLine = Create("CopyCutFullLine", false);
 	public static BoolOption smartSemicolonPlacement = Create("SmartSemicolonPlacement", false);
 	public static BoolOption loopSearchResults = Create("LoopSearchResults", true);
-	public static BoolOption smoothScrolling = Create("smoothScrolling2", true);
+	public static BoolOption smoothScrolling = Create("smoothScrolling3", true);
 	public static BoolOption sortRegionsByName = Create("sortRegionsByName", false);
 	public static BoolOption openAutoCompleteOnEscape = Create("OpenAutoCompleteOnEscape", Application.platform == RuntimePlatform.OSXEditor);
 	public static BoolOption autoCompleteAggressively = Create("AutoCompleteAggressively", true);
@@ -224,6 +225,7 @@ public static class SISettings
 		sb.Append(useStandardColorInPopups.ToJson()); sb.Append(",\n");
 		sb.Append(showThickerCaret.ToJson()); sb.Append(",\n");
 		sb.Append(autoFocusConsole.ToJson()); sb.Append(",\n");
+		sb.Append(monospacedFontConsole.ToJson()); sb.Append(",\n");
 		sb.Append(handleOpenAssets.ToJson()); sb.Append(",\n");
 		sb.Append(dontOpenAssets.ToJson()); sb.Append(",\n");
 		sb.Append(handleOpeningScripts.ToJson()); sb.Append(",\n");
@@ -592,7 +594,7 @@ Compile and reload assemblies with " + ctrlR + " or with a 'double-save'.",
 		labelWidth = 100f;
 		Draw("Tab size", tabSize, 1, 8);
 		labelWidth = 250f;
-		//Draw("Insert spaces on Tab key", insertSpacesOnTab);
+		Draw("Insert spaces on Tab key", insertSpacesOnTab);
 		
 		EditorGUILayout.Space();
 		

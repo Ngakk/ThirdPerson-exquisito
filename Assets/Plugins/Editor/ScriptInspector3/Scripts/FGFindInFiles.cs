@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
  * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -65,8 +65,7 @@ public static class FGFindInFiles
 		}
 		
 		var assembly = symbolType.Assembly;
-		var assemblyId = assembly.assemblyId;
-		FindAllAssemblyScripts(assemblyId);
+		FindAllAssemblyScripts(assembly);
 		for (int i = assets.Count; i --> 0; )
 			assets[i] = AssetDatabase.GUIDToAssetPath(assets[i]);
 		
@@ -153,11 +152,7 @@ public static class FGFindInFiles
 		var assembly = symbol.Assembly;
 		if (assembly == null)
 			return;
-		var assemblyId = assembly.assemblyId;
-		if (assemblyId != AssemblyDefinition.UnityAssembly.CSharpFirstPass &&
-			assemblyId != AssemblyDefinition.UnityAssembly.CSharpEditorFirstPass &&
-			assemblyId != AssemblyDefinition.UnityAssembly.CSharp &&
-			assemblyId != AssemblyDefinition.UnityAssembly.CSharpEditor)
+		if (!assembly.fromCsScripts)
 		{
 			// Only symbols defined in C# scripts can be renamed
 			return;
@@ -892,6 +887,40 @@ public static class FGFindInFiles
 		//var joined = string.Join(", ", scripts, 0, count);
 		//Debug.Log(joined);
 	}
-}
 	
+	public static void FindAllAssemblyScripts(AssemblyDefinition assembly)
+	{
+		var scripts = Directory.GetFiles("Assets", "*.cs", SearchOption.AllDirectories);
+		var count = scripts.Length;
+		
+		if (assets == null)
+			assets = new List<string>(count);
+		
+		for (var i = count; i --> 0; )
+		{
+			var path = scripts[i];
+			scripts[i] = path = path.Replace('\\', '/');
+			string lowerPath = path.ToLowerInvariant();
+			
+			if (path.Contains("/.") || lowerPath.StartsWith("assets/webplayertemplates/", System.StringComparison.Ordinal))
+			{
+				scripts[i] = scripts[--count];
+				continue;
+			}
+			
+			var assemblyFromPath = AssemblyDefinition.FromAssetPath(path);
+			if (assemblyFromPath != assembly)
+			{
+				scripts[i] = scripts[--count];
+				continue;
+			}			
+			
+			var guid = AssetDatabase.AssetPathToGUID(scripts[i]);
+			assets.Add(guid);
+		}
+		//var joined = string.Join("\n", scripts, 0, count);
+		//Debug.Log(joined);
+	}
+}
+
 }

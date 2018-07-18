@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -80,8 +80,13 @@ public class FGTextBufferManager : ScriptableObject
 
 	static FGTextBufferManager()
 	{
+#if UNITY_2017_2_OR_NEWER
+		EditorApplication.playModeStateChanged -= OnPlaymodeStateChanged;
+		EditorApplication.playModeStateChanged += OnPlaymodeStateChanged;
+#else
 		EditorApplication.playmodeStateChanged -= OnPlaymodeStateChanged;
 		EditorApplication.playmodeStateChanged += OnPlaymodeStateChanged;
+#endif
 		AppDomain.CurrentDomain.DomainUnload -= CurrentDomain_DomainUnload;
 		AppDomain.CurrentDomain.DomainUnload += CurrentDomain_DomainUnload;
 	}
@@ -185,6 +190,16 @@ public class FGTextBufferManager : ScriptableObject
 	//    //AssetDatabase.SaveAssets();
 	//}
 
+#if UNITY_2017_2_OR_NEWER
+	private static void OnPlaymodeStateChanged(PlayModeStateChange state)
+	{
+		if (_instance == null)
+			return;
+
+		if (state == PlayModeStateChange.ExitingEditMode)
+			SaveAllModified(false);
+	}
+#else
 	private static void OnPlaymodeStateChanged()
 	{
 		if (_instance == null)
@@ -193,6 +208,7 @@ public class FGTextBufferManager : ScriptableObject
 		if (EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying)
 			SaveAllModified(false);
 	}
+#endif
 	
 	public static void AddBufferToGlobalUndo(FGTextBuffer buffer)
 	{
@@ -604,35 +620,35 @@ public class FGTextBufferManager : ScriptableObject
 		DestroyImmediate(buffer);
 	}
 	
-	private static Dictionary<AssemblyDefinition.UnityAssembly, List<string>> scriptsWithPartialClass;
-	private static Dictionary<AssemblyDefinition.UnityAssembly, List<string>> scriptsWithPartialStruct;
-	private static Dictionary<AssemblyDefinition.UnityAssembly, List<string>> scriptsWithPartialInterface;
+	private static Dictionary<AssemblyDefinition, List<string>> scriptsWithPartialClass;
+	private static Dictionary<AssemblyDefinition, List<string>> scriptsWithPartialStruct;
+	private static Dictionary<AssemblyDefinition, List<string>> scriptsWithPartialInterface;
 	
 	public static void FindOtherTypeDeclarationParts(SymbolDeclaration declaration)
 	{
 		if (scriptsWithPartialClass == null)
 		{
-			scriptsWithPartialClass = new Dictionary<AssemblyDefinition.UnityAssembly, List<string>>();
-			scriptsWithPartialStruct = new Dictionary<AssemblyDefinition.UnityAssembly, List<string>>();
-			scriptsWithPartialInterface = new Dictionary<AssemblyDefinition.UnityAssembly, List<string>>();
+			scriptsWithPartialClass = new Dictionary<AssemblyDefinition, List<string>>();
+			scriptsWithPartialStruct = new Dictionary<AssemblyDefinition, List<string>>();
+			scriptsWithPartialInterface = new Dictionary<AssemblyDefinition, List<string>>();
 		}
 		
 		var typeDefinition = declaration.definition as TypeDefinition;
 		if (typeDefinition == null)
 			return;
-		var assemblyId = typeDefinition.Assembly.assemblyId;
+		var assembly = typeDefinition.Assembly;
 		
 		var cachedAssemblyScripts =
 			declaration.kind == SymbolKind.Class ? scriptsWithPartialClass :
 			declaration.kind == SymbolKind.Struct ? scriptsWithPartialStruct :
 			scriptsWithPartialInterface;
 		List<string> scriptsWithPartials;
-		if (!cachedAssemblyScripts.TryGetValue(assemblyId, out scriptsWithPartials))
+		if (!cachedAssemblyScripts.TryGetValue(assembly, out scriptsWithPartials))
 		{
 			FGFindInFiles.Reset();
-			FGFindInFiles.FindAllAssemblyScripts(assemblyId);
+			FGFindInFiles.FindAllAssemblyScripts(assembly);
 			
-			cachedAssemblyScripts[assemblyId] = scriptsWithPartials = new List<string>(FGFindInFiles.assets.Count);
+			cachedAssemblyScripts[assembly] = scriptsWithPartials = new List<string>(FGFindInFiles.assets.Count);
 			
 			var partialTypePhrase = new string[] {
 				"partial",

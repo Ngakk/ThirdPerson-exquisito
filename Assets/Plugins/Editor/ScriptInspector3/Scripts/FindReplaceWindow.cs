@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -52,6 +52,7 @@ public class FindReplaceWindow : EditorWindow
 	const float fixedHeightFind = 232f;
 	const float fixedHeightReplace = 260f;
 	
+#if !UNITY_2017_3_OR_NEWER
 	private static string[] lookInOptionsAll = new [] {
 		"Whole Project",
 		"Open Tabs Only",
@@ -64,6 +65,7 @@ public class FindReplaceWindow : EditorWindow
 		"First-Pass Game Assemblies",
 		"First-Pass Editor Assemblies",
 	};
+#endif
 	
 	private static string[] lookInOptionsNoAssemblies = new [] {
 		"Whole Project",
@@ -460,12 +462,14 @@ public class FindReplaceWindow : EditorWindow
 				GUI.FocusControl("Asset types");
 			resetFocus = false;
 			
+#if !UNITY_2017_3_OR_NEWER
 			if (lookForOption != FindReplace_LookFor.AllAssets &&
 				lookForOption != FindReplace_LookFor.Shaders && lookForOption != FindReplace_LookFor.TextAssets)
 			{
 				lookInOption = (FindReplace_LookIn) EditorGUILayout.Popup("Search scope:", (int) lookInOption, lookInOptionsAll);
 			}
 			else
+#endif
 			{
 				var option = (int) lookInOption;
 				if (lookInOption > FindReplace_LookIn.CurrentTabOnly)

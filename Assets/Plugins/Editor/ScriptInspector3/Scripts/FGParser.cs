@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -383,7 +383,7 @@ public abstract class FGParser
 				if (assembly is System.Reflection.Emit.AssemblyBuilder)
 					continue;
 				
-				var takeAllTypes = AssemblyDefinition.IsScriptAssemblyName(assembly.GetName().Name);
+				var takeAllTypes = AssemblyDefinition.IsScriptAssembly(assembly);
 				var assemblyTypes = takeAllTypes ? assembly.GetTypes() : assembly.GetExportedTypes();
 				foreach (var type in assemblyTypes)
 				{
@@ -416,7 +416,7 @@ public abstract class FGParser
 	
 	public void OnLoaded()
 	{
-		scriptDefines = new HashSet<string>(UnityEditor.EditorUserBuildSettings.activeScriptCompilationDefines);
+		//scriptDefines = new HashSet<string>(UnityEditor.EditorUserBuildSettings.activeScriptCompilationDefines);
 		scriptDefinesChanged = false;
 		
 		ParseAll(assetPath);
@@ -1261,7 +1261,14 @@ public abstract class FGParser
 		
 		if (parentRegion.children != null)
 		{
-			reuseRegion = parentRegion.children.Find(x => x.line == formatedLine);
+			for (var i = parentRegion.children.Count; i-- > 0;)
+			{
+				if (parentRegion.children[i].line == formatedLine)
+				{
+					reuseRegion = parentRegion.children[i];
+					break;
+				}
+			}
 		}
 		if (reuseRegion != null)
 		{

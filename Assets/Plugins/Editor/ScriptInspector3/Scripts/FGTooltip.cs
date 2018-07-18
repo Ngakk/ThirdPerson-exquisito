@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -284,8 +284,15 @@ public class FGTooltip : FGPopupWindow
 			textEditor.argumentsHint = null;
 			textEditor.CloseArgumentsHint();
 		}
-		Close();
-		DestroyImmediate(this);
+		try
+		{
+			Close();
+			DestroyImmediate(this);
+		}
+		catch //(System.Exception e)
+		{
+			//Debug.LogException(e);
+		}
 	}
 
 	public void OnGUI()

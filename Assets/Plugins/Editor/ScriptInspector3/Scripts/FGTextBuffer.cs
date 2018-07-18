@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -1721,13 +1721,34 @@ public class FGTextBuffer : ScriptableObject
 
 	public CaretPos InsertText(CaretPos position, string text)
 	{
-		RegisterUndoText("Insert Text", position, position, text);
-
 		CaretPos pos = new CaretPos { characterIndex = position.characterIndex, column = position.column, virtualColumn = position.column, line = position.line };
 		CaretPos end = new CaretPos { characterIndex = position.characterIndex, column = position.column, virtualColumn = position.column, line = position.line };
 
 		string[] insertLines = text.Split(new char[] { '\n' }, System.StringSplitOptions.None);
-
+		
+		if (recordUndo && SISettings.insertSpacesOnTab)
+		{
+			var tabSize = SISettings.tabSize;
+			var column = pos.column;
+			for (var i = 0; i < insertLines.Length; i++)
+			{   
+				text = insertLines[i];
+				int tabIndex;
+				while ((tabIndex = text.IndexOf('\t')) >= 0)
+				{
+					var c = column + tabIndex;
+					c = tabSize - c % tabSize;
+					text = string.Concat(text.Substring(0, tabIndex), new string(' ', c), text.Substring(tabIndex + 1));
+				}
+				insertLines[i] = text;
+				column = 0;
+			}
+			if (insertLines.Length > 1)
+				text = string.Join("\n", insertLines);
+		}
+		
+		RegisterUndoText("Insert Text", position, position, text);
+		
 		if (insertLines.Length == 1)
 		{
 			lines[pos.line] = lines[pos.line].Insert(pos.characterIndex, text);
@@ -2217,7 +2238,7 @@ public class FGTextBuffer : ScriptableObject
 			return null;
 		
 		var leaf = firstNonTrivia != null ? firstNonTrivia.parent : null;
-		if (leaf == null && firstToken != null)
+		if (leaf == null && (firstToken == null || firstToken.text.StartsWith("#", System.StringComparison.Ordinal)))
 			return null;
 		
 		string indent = null;
@@ -2229,7 +2250,9 @@ public class FGTextBuffer : ScriptableObject
 		if (leaf == null)
 		{
 			var previousLeaf = GetNonTriviaTokenLeftOf(line, 0);
-			if (previousLeaf == null || previousLeaf.parent == null)
+			if (previousLeaf == null)
+				return "";
+			if (previousLeaf.parent == null)
 				return null;
 			
 			ParseTree.BaseNode previousNode = previousLeaf.parent;

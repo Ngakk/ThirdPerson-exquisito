@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -236,6 +236,9 @@ public class FindResultsWindow : EditorWindow
 			{
 				if (prevWnd != wnd && prevWnd)
 				{
+					if (FGCodeWindow.DestroyWindowIfOrphaned(prevWnd))
+						continue;
+						
 					docked = FGCodeWindow.DockNextTo(wnd, prevWnd);
 					if (docked)
 						break;
@@ -755,6 +758,16 @@ public class FindResultsWindow : EditorWindow
 		
 		if (Event.current.type == EventType.KeyDown)
 		{
+			if (!Event.current.alt && !Event.current.shift && !EditorGUI.actionKey)
+			{
+				if (Event.current.keyCode == KeyCode.Escape)
+				{
+					var guid = FGCodeWindow.GetGuidHistory().FirstOrDefault();
+					if (!string.IsNullOrEmpty(guid))
+						FGCodeWindow.OpenAssetInTab(guid);
+				}
+			}
+			
 			var nextItem = currentItem;
 			
 			if (Event.current.keyCode == KeyCode.DownArrow)

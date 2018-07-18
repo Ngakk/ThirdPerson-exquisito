@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.16, October 2016
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -39,11 +39,11 @@ namespace ScriptInspector.Themes
 			builtInLiterals			= new Color32(215, 139,  54, 255),
 			operators				= new Color32(0xE8, 0xE2, 0xB7, 255),
 			
-			referenceTypes			= new Color32(212, 106, 0, 0xFF),
-			valueTypes				= new Color32(212, 106, 0, 0xFF),
+			referenceTypes			= new Color32(232, 116, 0, 0xFF),
+			valueTypes				= new Color32(232, 116, 0, 0xFF),
 			interfaceTypes			= new Color32(0x21, 0x95, 0x98, 0xFF),
 			enumTypes				= new Color32(0x76, 0x9A, 0xA5, 0xFF),
-			delegateTypes			= new Color32(212, 106, 0, 0xFF),
+			delegateTypes			= new Color32(232, 116, 0, 0xFF),
 			builtInTypes			= new Color32(215, 139,  54, 255),
 			
 			namespaces				= new Color32(183, 196, 208, 255),
@@ -80,8 +80,8 @@ namespace ScriptInspector.Themes
 			currentLine             = new Color32( 73,  73,  73, 255),
 			currentLineInactive     = new Color32( 73,  73,  73, 255),
 			
-			referenceHighlight      = (Color)TangoColors.skyblue2 * 0.3f + (Color)TangoColors.aluminium6 * 0.7f,
-			referenceModifyHighlight = (Color)TangoColors.scarletred1 * 0.3f + (Color)TangoColors.aluminium6 * 0.7f,
+			referenceHighlight      = new Color32( 64, 80, 112, 224),
+			referenceModifyHighlight = new Color32(134,  75,  76, 204),
 			
 			tooltipBackground       = new Color32( 64,  64,  64, 255),
 			tooltipFrame            = new Color32(128, 128, 128, 255),

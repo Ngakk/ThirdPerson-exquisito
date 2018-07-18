@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -191,6 +191,69 @@ public class CsParser : FGParser
 		});
 		parserThread.Start();
 	}
+	
+	private static string[] rspFileNames = { "Assets/mcs.rsp", "Assets/smcs.rsp", "Assets/gmcs.rsp", "Assets/csc.rsp" };
+	private static char[] optionsSeparators = { ' ', '\n', '\r' };
+	private static char[] definesSeparators = { ';', ',' };
+	private static HashSet<string> activeScriptCompilationDefines;
+	protected static HashSet<string> GetActiveScriptCompilationDefines()
+	{
+		if (activeScriptCompilationDefines != null)
+			return activeScriptCompilationDefines;
+		
+		activeScriptCompilationDefines = new HashSet<string>(UnityEditor.EditorUserBuildSettings.activeScriptCompilationDefines);
+		string rspText = null;
+		try
+		{
+			string rspFileName = null;
+			for (var i = 0; i < rspFileNames.Length; ++i )
+			{
+				if (System.IO.File.Exists(rspFileNames[i]))
+				{
+					rspFileName = rspFileNames[i];
+					break;
+				}
+			}
+		
+			if (rspFileName != null)
+			{
+				rspText = System.IO.File.ReadAllText(rspFileName);
+			}
+		}
+		catch (System.Exception e)
+		{
+			Debug.LogException(e);
+		}
+		
+		if (rspText != null)
+		{
+			var options = rspText.Split(optionsSeparators, StringSplitOptions.RemoveEmptyEntries);
+			for (var i = options.Length; i --> 0; )
+			{
+				var option = options[i];
+				if (option.StartsWith("-define:", StringComparison.OrdinalIgnoreCase) ||
+					option.StartsWith("/define:", StringComparison.OrdinalIgnoreCase))
+				{
+					option = option.Substring("-define:".Length);
+				}
+				else if (option.StartsWith("-d:", StringComparison.OrdinalIgnoreCase) ||
+					option.StartsWith("/d:", StringComparison.OrdinalIgnoreCase))
+				{
+					option = option.Substring("-d:".Length);
+				}
+				else
+				{
+					continue;
+				}
+					
+				var defineOptions = option.Split(definesSeparators, StringSplitOptions.RemoveEmptyEntries);
+				for (var j = defineOptions.Length; j --> 0; )
+					activeScriptCompilationDefines.Add(defineOptions[j]);
+			}
+		}
+		
+		return activeScriptCompilationDefines;
+	}
 
 	public override void LexLine(int currentLine, FGTextBuffer.FormatedLine formatedLine)
 	{
@@ -207,7 +270,7 @@ public class CsParser : FGParser
 		
 		if (currentLine == 0)
 		{
-			var defaultScriptDefines = UnityEditor.EditorUserBuildSettings.activeScriptCompilationDefines;
+			var defaultScriptDefines = GetActiveScriptCompilationDefines();
 			if (scriptDefines == null || !scriptDefines.SetEquals(defaultScriptDefines))
 			{
 				if (scriptDefines == null)
@@ -388,50 +451,139 @@ public class CsParser : FGParser
 				}
 				else if (token.text == "elif")
 				{
-					bool active = ParsePPOrExpression(line, formatedLine, ref startAt);
-					bool inactiveParent = formatedLine.regionTree.kind > FGTextBuffer.RegionTree.Kind.LastActive;
-					if (formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.If ||
-						formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.Elif ||
-						formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.InactiveElif)
+					if (formatedLine.regionTree.parent == null)
 					{
-						OpenRegion(formatedLine, FGTextBuffer.RegionTree.Kind.InactiveElif);
-					}
-					else if (formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.InactiveIf)
-					{
-						inactiveParent = formatedLine.regionTree.parent.kind > FGTextBuffer.RegionTree.Kind.LastActive;
-						if (active && !inactiveParent)
-						{
-							OpenRegion(formatedLine, FGTextBuffer.RegionTree.Kind.Elif);
-						}
-						else
-						{
-							OpenRegion(formatedLine, FGTextBuffer.RegionTree.Kind.InactiveElif);
-						}
+						token.tokenKind = SyntaxToken.Kind.PreprocessorUnexpectedDirective;
 					}
 					else
 					{
-						token.tokenKind = SyntaxToken.Kind.PreprocessorUnexpectedDirective;
+						bool active = ParsePPOrExpression(line, formatedLine, ref startAt);
+						bool inactiveParent = formatedLine.regionTree.parent.kind > FGTextBuffer.RegionTree.Kind.LastActive;
+						bool setActive = active && !inactiveParent;
+						if (formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.If)
+						{
+							setActive = false;
+						}
+						else if (formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.Elif ||
+							formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.InactiveElif)
+						{
+							if (setActive && formatedLine.regionTree.parent != null)
+							{
+								var lineIndex = formatedLine.index;
+								var ifIndex = -1;
+								var activeIndex = -1;
+								var siblings = formatedLine.regionTree.parent.children;
+								for (var i = siblings.Count; i --> 0; )
+								{
+									var siblingLine = siblings[i].line;
+									var siblingIndex = siblingLine.index;
+									if (siblingIndex < lineIndex)
+									{
+										if (siblingIndex > activeIndex &&
+											siblingLine.regionTree.kind < FGTextBuffer.RegionTree.Kind.LastActive)
+										{
+											activeIndex = siblingIndex;
+										}
+										if (siblingIndex > ifIndex &&
+											(siblingLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.If ||
+											siblingLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.InactiveIf))
+										{
+											ifIndex = siblingIndex;
+										}
+									}
+								}
+								
+								if (activeIndex >= ifIndex)
+								{
+									setActive = false;
+								}
+							}
+						}
+						else if (formatedLine.regionTree.kind != FGTextBuffer.RegionTree.Kind.InactiveIf)
+						{
+							token.tokenKind = SyntaxToken.Kind.PreprocessorUnexpectedDirective;
+							setActive = !inactiveParent;
+						}
+
+						if (token.tokenKind != SyntaxToken.Kind.PreprocessorUnexpectedDirective)
+						{
+							if (setActive)
+							{
+								OpenRegion(formatedLine, FGTextBuffer.RegionTree.Kind.Elif);
+							}
+							else
+							{
+								OpenRegion(formatedLine, FGTextBuffer.RegionTree.Kind.InactiveElif);
+							}
+						}
 					}
 				}
 				else if (token.text == "else")
 				{
-					if (formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.If ||
-						formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.Elif)
+					if (formatedLine.regionTree.parent == null)
 					{
-						OpenRegion(formatedLine, FGTextBuffer.RegionTree.Kind.InactiveElse);
-					}
-					else if (formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.InactiveIf ||
-						formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.InactiveElif)
-					{
-						bool inactiveParent = formatedLine.regionTree.parent.kind > FGTextBuffer.RegionTree.Kind.LastActive;
-						if (inactiveParent)
-							OpenRegion(formatedLine, FGTextBuffer.RegionTree.Kind.InactiveElse);
-						else
-							OpenRegion(formatedLine, FGTextBuffer.RegionTree.Kind.Else);
+						token.tokenKind = SyntaxToken.Kind.PreprocessorUnexpectedDirective;
 					}
 					else
 					{
-						token.tokenKind = SyntaxToken.Kind.PreprocessorUnexpectedDirective;
+						bool inactiveParent = formatedLine.regionTree.parent.kind > FGTextBuffer.RegionTree.Kind.LastActive;
+						bool setActive = !inactiveParent;
+						if (formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.If ||
+							formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.Elif)
+						{
+							setActive = false;
+						}
+						else if (formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.InactiveIf ||
+							formatedLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.InactiveElif)
+						{
+							if (setActive)
+							{
+								var lineIndex = formatedLine.index;
+								var ifIndex = -1;
+								var activeIndex = -1;
+								var siblings = formatedLine.regionTree.parent.children;
+								for (var i = siblings.Count; i --> 0; )
+								{
+									var siblingLine = siblings[i].line;
+									var siblingIndex = siblingLine.index;
+									if (siblingIndex < lineIndex)
+									{
+										if (siblingIndex > activeIndex &&
+											siblingLine.regionTree.kind < FGTextBuffer.RegionTree.Kind.LastActive)
+										{
+											activeIndex = siblingIndex;
+										}
+										if (siblingIndex > ifIndex &&
+										(siblingLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.If ||
+											siblingLine.regionTree.kind == FGTextBuffer.RegionTree.Kind.InactiveIf))
+										{
+											ifIndex = siblingIndex;
+										}
+									}
+								}
+								
+								if (activeIndex >= ifIndex)
+								{
+									setActive = false;
+								}
+							}
+						}
+						else if (formatedLine.regionTree.kind != FGTextBuffer.RegionTree.Kind.InactiveIf)
+						{
+							token.tokenKind = SyntaxToken.Kind.PreprocessorUnexpectedDirective;
+						}
+
+						if (token.tokenKind != SyntaxToken.Kind.PreprocessorUnexpectedDirective)
+						{
+							if (setActive)
+							{
+								OpenRegion(formatedLine, FGTextBuffer.RegionTree.Kind.Else);
+							}
+							else
+							{
+								OpenRegion(formatedLine, FGTextBuffer.RegionTree.Kind.InactiveElse);
+							}
+						}
 					}
 				}
 				else if (token.text == "endif")

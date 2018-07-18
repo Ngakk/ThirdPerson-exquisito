@@ -394,88 +394,46 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 183222213}
     m_Modifications:
-    - target: {fileID: 400018, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
+    - target: {fileID: 4862264225715810, guid: b207dbfb5e66d6a46b1536e0398aa723, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 400018, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
+    - target: {fileID: 4862264225715810, guid: b207dbfb5e66d6a46b1536e0398aa723, type: 2}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 400018, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
+    - target: {fileID: 4862264225715810, guid: b207dbfb5e66d6a46b1536e0398aa723, type: 2}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 400018, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
+    - target: {fileID: 4862264225715810, guid: b207dbfb5e66d6a46b1536e0398aa723, type: 2}
       propertyPath: m_LocalRotation.x
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 400018, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
+    - target: {fileID: 4862264225715810, guid: b207dbfb5e66d6a46b1536e0398aa723, type: 2}
       propertyPath: m_LocalRotation.y
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 400018, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
+    - target: {fileID: 4862264225715810, guid: b207dbfb5e66d6a46b1536e0398aa723, type: 2}
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 400018, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
+    - target: {fileID: 4862264225715810, guid: b207dbfb5e66d6a46b1536e0398aa723, type: 2}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 400018, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
+    - target: {fileID: 4862264225715810, guid: b207dbfb5e66d6a46b1536e0398aa723, type: 2}
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 100050, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2300024, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 45f323fc14551f64fafa64d1776d8b28, type: 2}
     m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
+  m_ParentPrefab: {fileID: 100100000, guid: b207dbfb5e66d6a46b1536e0398aa723, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1185610936 stripped
 Transform:
-  m_PrefabParentObject: {fileID: 400018, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
+  m_PrefabParentObject: {fileID: 4862264225715810, guid: b207dbfb5e66d6a46b1536e0398aa723,
+    type: 2}
   m_PrefabInternal: {fileID: 1185610935}
---- !u!1 &1185610937 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 100018, guid: 0fb5aa06fb6f7d84eb6211b708288bba, type: 3}
-  m_PrefabInternal: {fileID: 1185610935}
---- !u!95 &1185610938
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1185610937}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: f5df0f749f43db142a8a17f0e4933d1e, type: 3}
-  m_Controller: {fileID: 9100000, guid: 0e3f1833790013e4cb75e95fe01eee3f, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &1185610939
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1185610937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c849ea9fce87a3943935b8783510e2ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Velocidad: {x: 10, y: 20, z: 100}
-  anim: {fileID: 1185610938}
 --- !u!1 &1650905846
 GameObject:
   m_ObjectHideFlags: 0

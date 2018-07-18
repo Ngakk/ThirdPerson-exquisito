@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -447,7 +447,7 @@ public class FGCodeWindow : EditorWindow
 	[UnityEditor.Callbacks.OnOpenAssetAttribute(0)]
 	public static bool OnOpenAsset(int instanceID, int line)
 	{
-		var allowInvert = Event.current.keyCode != KeyCode.DownArrow;
+		var allowInvert = Event.current != null && Event.current.keyCode != KeyCode.DownArrow;
 		
 		if (openInExternalIDE || (allowInvert && EditorGUI.actionKey ? SISettings.handleOpenAssets : SISettings.dontOpenAssets))
 		{
@@ -794,22 +794,32 @@ public class FGCodeWindow : EditorWindow
 
 	private void DestroyIfOrphaned()
 	{
-		var parent = API.parentField.GetValue(this) as Object;
+		DestroyWindowIfOrphaned(this);
+	}
+	
+	public static bool DestroyWindowIfOrphaned(EditorWindow wnd)
+	{
+		var parent = API.parentField.GetValue(wnd) as Object;
 		if (!parent)
 		{
-			DestroyImmediate(this);
-			return;
+			DestroyImmediate(wnd);
+			return true;
 		}
 		
 		if (parent.GetType() != API.dockAreaType)
-			return;
+			return false;
 
 		var panes = API.panesField.GetValue(parent) as List<EditorWindow>;
 		if (panes == null)
-			return;
+			return false;
 
-		if (!panes.Contains(this))
-			DestroyImmediate(this);
+		if (!panes.Contains(wnd))
+		{
+			DestroyImmediate(wnd);
+			return true;
+		}
+		
+		return false;
 	}
 
 	private void OnEnable()
@@ -1751,7 +1761,9 @@ public class FGCodeWindow : EditorWindow
 
 		if (System.IO.File.Exists(path))
 		{
+#if !UNITY_2017_1_OR_NEWER
 			rc.y -= 5f;
+#endif
 			
 			FGCodeWindow setFocusOn = null;
 			FGCodeWindow lastShown = null;
@@ -1810,6 +1822,27 @@ public class FGCodeWindow : EditorWindow
 				else
 				{
 					tab.Repaint();
+				}
+			}
+			
+			var focusedSi3Tab = focusedWindow as FGCodeWindow;
+			if (!focusedSi3Tab || !focusedSi3Tab.IsFloating())
+			{
+				FGCodeWindow setFocusOn = null;
+				for (var i = floatingSi3Tabs.Count; i --> 0; )
+				{
+					var tab = floatingSi3Tabs[i];
+					var index = System.Array.IndexOf(oldHistory, tab.targetAssetGuid);
+					if (index >= 0 && index < mostRecentIndex)
+					{
+						mostRecentIndex = index;
+						setFocusOn = tab;
+					}
+				}
+				if (setFocusOn)
+				{
+					setFocusOn.Focus();
+					return;
 				}
 			}
 			

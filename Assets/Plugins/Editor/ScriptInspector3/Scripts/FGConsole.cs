@@ -1,6 +1,6 @@
 ﻿/* SCRIPT INSPECTOR 3
- * version 3.0.18, May 2017
- * Copyright © 2012-2017, Flipbook Games
+ * version 3.0.21, February 2018
+ * Copyright © 2012-2018, Flipbook Games
  * 
  * Unity's legendary editor for C#, UnityScript, Boo, Shaders, and text,
  * now transformed into an advanced C# IDE!!!
@@ -25,6 +25,15 @@ public class FGConsole : EditorWindow
 	, IHasCustomMenu
 #endif
 {
+	const BindingFlags staticMemberFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+	const BindingFlags instanceMemberFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+	
+	private static System.Type consoleConstantsType = System.Type.GetType("UnityEditor.ConsoleWindow+Constants,UnityEditor");
+	private static FieldInfo errorStyleField;
+	private static FieldInfo warningStyleField;
+	private static FieldInfo logStyleField;
+	private static FieldInfo messageStyleField;
+	
 	public readonly static System.Type consoleWindowType;
 	private static FieldInfo consoleWindowField;
 	private static FieldInfo consoleListViewField;
@@ -45,7 +54,9 @@ public class FGConsole : EditorWindow
 	private static object logEntry;
 	
 	public static int repaintOnUpdateCounter = 0;
-
+	
+	private static Font font;
+	
 	private static bool openLogEntriesInSi2
 	{
 		get { return EditorPrefs.GetBool("ScriptInspector.OpenLogEntriesInSi2", true); }
@@ -64,32 +75,42 @@ public class FGConsole : EditorWindow
 		consoleWindowType = typeof(EditorWindow).Assembly.GetType("UnityEditor.ConsoleWindow");
 		if (consoleWindowType != null)
 		{
-			consoleWindowField = consoleWindowType.GetField("ms_ConsoleWindow", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-			consoleListViewField = consoleWindowType.GetField("m_ListView", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-			consoleLVHeightField = consoleWindowType.GetField("ms_LVHeight", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-			consoleActiveTextField = consoleWindowType.GetField("m_ActiveText", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-			consoleOnGUIMethod = consoleWindowType.GetMethod("OnGUI", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			consoleWindowField = consoleWindowType.GetField("ms_ConsoleWindow", staticMemberFlags);
+			consoleListViewField = consoleWindowType.GetField("m_ListView", instanceMemberFlags);
+			consoleLVHeightField = consoleWindowType.GetField("ms_LVHeight", instanceMemberFlags);
+			consoleActiveTextField = consoleWindowType.GetField("m_ActiveText", instanceMemberFlags);
+			consoleOnGUIMethod = consoleWindowType.GetMethod("OnGUI", instanceMemberFlags);
+			
+			if (consoleConstantsType != null)
+			{
+				errorStyleField = consoleConstantsType.GetField("ErrorStyle", staticMemberFlags);
+				warningStyleField = consoleConstantsType.GetField("WarningStyle", staticMemberFlags);
+				logStyleField = consoleConstantsType.GetField("LogStyle", staticMemberFlags);
+				messageStyleField = consoleConstantsType.GetField("MessageStyle", staticMemberFlags);
+			}
 		}
 		listViewStateType = typeof(EditorWindow).Assembly.GetType("UnityEditor.ListViewState");
 		if (listViewStateType != null)
 		{
-			listViewStateRowField = listViewStateType.GetField("row", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+			listViewStateRowField = listViewStateType.GetField("row", instanceMemberFlags);
 		}
-		editorWindowPosField = typeof(EditorWindow).GetField("m_Pos", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-		logEntriesType = typeof(EditorWindow).Assembly.GetType("UnityEditorInternal.LogEntries");
+		editorWindowPosField = typeof(EditorWindow).GetField("m_Pos", instanceMemberFlags);
+		logEntriesType = typeof(EditorWindow).Assembly.GetType("UnityEditor.LogEntries")
+			?? typeof(EditorWindow).Assembly.GetType("UnityEditorInternal.LogEntries");
 		if (logEntriesType != null)
 		{
-			getEntryMethod = logEntriesType.GetMethod("GetEntryInternal", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-			startGettingEntriesMethod = logEntriesType.GetMethod("StartGettingEntries", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-			endGettingEntriesMethod = logEntriesType.GetMethod("EndGettingEntries", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			getEntryMethod = logEntriesType.GetMethod("GetEntryInternal", staticMemberFlags);
+			startGettingEntriesMethod = logEntriesType.GetMethod("StartGettingEntries", staticMemberFlags);
+			endGettingEntriesMethod = logEntriesType.GetMethod("EndGettingEntries", staticMemberFlags);
 		}
-		logEntryType = typeof(EditorWindow).Assembly.GetType("UnityEditorInternal.LogEntry");
+		logEntryType = typeof(EditorWindow).Assembly.GetType("UnityEditor.LogEntry")
+			?? typeof(EditorWindow).Assembly.GetType("UnityEditorInternal.LogEntry");
 		if (logEntryType != null)
 		{
 			logEntry = System.Activator.CreateInstance(logEntryType);
-			logEntryFileField = logEntryType.GetField("file", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-			logEntryLineField = logEntryType.GetField("line", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-			logEntryInstanceIDField = logEntryType.GetField("instanceID", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+			logEntryFileField = logEntryType.GetField("file", instanceMemberFlags);
+			logEntryLineField = logEntryType.GetField("line", instanceMemberFlags);
+			logEntryInstanceIDField = logEntryType.GetField("instanceID", instanceMemberFlags);
 		}
 	}
 
@@ -229,7 +250,11 @@ Click the button below to open the Console window...", MessageType.Info);
 			}
 			try { consoleOnGUIMethod.Invoke(console, null); } catch { }
 			
+#if UNITY_2017_1_OR_NEWER
+			var rc = new Rect(355f, -1f, 144f, 18f);
+#else
 			var rc = new Rect(254f, -1f, 144f, 18f);
+#endif
 			var autoFocusText = SISettings.autoFocusConsole == 0 ? "Auto-Focus: Never" :
 				SISettings.autoFocusConsole == 1 ? "Auto-Focus: On Error" : "Auto-Focus: On Compile";
 			if (GUI.Button(rc, autoFocusText, EditorStyles.toolbarDropDown))
@@ -243,10 +268,58 @@ Click the button below to open the Console window...", MessageType.Info);
 					() => { SISettings.autoFocusConsole.Value = 2; });
 				menu.DropDown(rc);
 			}
+
+			if (font == null && SISettings.monospacedFontConsole)
+			{
+				font = FGTextEditor.LoadEditorResource<Font>("Smooth Fonts/DejaVu Sans Mono.ttf");
+				SetConsoleFont(font);
+			}
+
+			rc.xMin = rc.xMax + 4f;
+			rc.xMax = rc.xMin + 100f;
+			if (SISettings.monospacedFontConsole != GUI.Toggle(rc, SISettings.monospacedFontConsole, "Monospaced Font", EditorStyles.toolbarButton))
+			{
+				SISettings.monospacedFontConsole.Value = !SISettings.monospacedFontConsole;
+				
+				if (font == null && SISettings.monospacedFontConsole)
+				{
+					font = FGTextEditor.LoadEditorResource<Font>("Smooth Fonts/DejaVu Sans Mono.ttf");
+				}
+
+				SetConsoleFont(SISettings.monospacedFontConsole ? font : null);
+			}
 		}
 		finally
 		{
 			editorWindowPosField.SetValue(console, oldPosition);
+		}
+	}
+	
+	private static void SetConsoleFont(Font font)
+	{
+		GUIStyle style = errorStyleField.GetValue(null) as GUIStyle;
+		if (style != null)
+		{
+			style.font = font;
+			style.fontSize = font != null ? 11 : 0;
+		}
+		style = warningStyleField.GetValue(null) as GUIStyle;
+		if (style != null)
+		{
+			style.font = font;
+			style.fontSize = font != null ? 11 : 0;
+		}
+		style = logStyleField.GetValue(null) as GUIStyle;
+		if (style != null)
+		{
+			style.font = font;
+			style.fontSize = font != null ? 11 : 0;
+		}
+		style = messageStyleField.GetValue(null) as GUIStyle;
+		if (style != null)
+		{
+			style.font = font;
+			style.fontSize = font != null ? 11 : 0;
 		}
 	}
 
