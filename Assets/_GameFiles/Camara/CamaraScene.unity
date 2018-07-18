@@ -209,16 +209,20 @@ MonoBehaviour:
   target: {fileID: 915070338}
   position:
     targetPosOffset: {x: 0, y: 3.4, z: 0}
-    lookSmooth: 100
     distanceFromTarget: -8
     zoomSmooth: 10
+    zoomStep: 2
     maxZoom: -2
     minZoom: -15
+    smoothFollow: 1
+    smooth: 0.05
+    newDistance: -8
+    adjustmentDistance: -8
   orbit:
     xRotation: -20
     yRotation: -180
-    maxXRotation: 25
-    minXRotation: -85
+    maxXRotation: 15
+    minXRotation: -55
     vOrbitSmooth: 150
     hOrbitSmooth: 150
   input:

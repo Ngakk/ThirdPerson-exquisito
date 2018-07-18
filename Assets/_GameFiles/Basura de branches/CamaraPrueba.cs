@@ -15,7 +15,7 @@ public class CamaraPrueba : MonoBehaviour {
         public float maxZoom = -2;
         public float minZoom = -15;
         public bool smoothFollow = true;
-        public float smoot = 0.05f;
+        public float smooth = 0.05f;
 
         [HideInInspector]
         public float newDistance = -8;
@@ -86,7 +86,7 @@ public class CamaraPrueba : MonoBehaviour {
     void LookAtTarget()
     {
         Quaternion targetRotation = Quaternion.LookRotation(targetPos - transform.position);
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, position.lookSmooth * Time.deltaTime);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, position.smooth * Time.deltaTime);
     }
 
     void SetCameraTarget(Transform t)
