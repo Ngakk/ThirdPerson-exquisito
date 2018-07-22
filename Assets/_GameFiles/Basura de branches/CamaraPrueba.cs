@@ -35,6 +35,13 @@ public class CamaraPrueba : MonoBehaviour {
     }
 
     [System.Serializable]
+    public class DebugSettings
+    {
+        public bool drawDesiredCollisionLines = true;
+        public bool drawAdjustedCollisionLines = true;
+    }
+
+    [System.Serializable]
     public class InputSettings
     {
         public string Snap = "Snap";
@@ -46,20 +53,31 @@ public class CamaraPrueba : MonoBehaviour {
     public PositionSettings position = new PositionSettings();
     public OrbitSettings orbit = new OrbitSettings();
     public InputSettings input = new InputSettings();
+    public DebugSettings debug = new DebugSettings();
+    public CollisionHandler collision = new CollisionHandler();
 
     Vector3 targetPos = Vector3.zero;
     Vector3 destination = Vector3.zero;
+    Vector3 adjustedDestination = Vector3.zero;
+    Vector3 camVel = Vector3.zero;
     CharacterController charController;
-    float vOrbitInput, hOrbitInput, zoomInput, hOrbitSnapInput;
+    float vOrbitInput, hOrbitInput, zoomInput, hOrbitSnapInput, mouseOrbitInput, vMouseOrbitInput;
+    Vector3 previousMousePos = Vector3.zero;
+    Vector3 currentMousePos = Vector3.zero;
 
 	// Use this for initialization
 	void Start () {
         SetCameraTarget(target);
 
-        targetPos = target.position + position.targetPosOffset;
-        destination = Quaternion.Euler(orbit.xRotation, orbit.yRotation, 0) * -Vector3.forward * position.distanceFromTarget;
-        destination += target.position;
-        transform.position = destination;
+        vOrbitInput = hOrbitInput = zoomInput = hOrbitInput = mouseOrbitInput = vMouseOrbitInput = 0;
+
+        MoveToTarget();
+
+        collision.Initialize(Camera.main);
+        collision.UpdateCameraClipPoints(transform.position, transform.rotation, ref collision.adjustedCameraClipPoints);
+        collision.UpdateCameraClipPoints(destination, transform.rotation, ref collision.desiredCameraClipPoints);
+
+        previousMousePos = currentMousePos = Input.mousePosition;
     }
 
     void Update()
@@ -69,7 +87,6 @@ public class CamaraPrueba : MonoBehaviour {
         ZoomInOnTarget();
     }
 	
-	// Update is called once per frame
 	void LateUpdate () {
         MoveToTarget();
         LookAtTarget();
@@ -103,8 +120,8 @@ public class CamaraPrueba : MonoBehaviour {
     {
         vOrbitInput = Input.GetAxis("camVertical");
         hOrbitInput = Input.GetAxis("camHorizontal");
-        hOrbitSnapInput = Input.GetAxis("Snap");
-        zoomInput = Input.GetAxis("zoom");
+        hOrbitSnapInput = Input.GetAxis(input.ORBIT_HORIZONTAL_SNAP);
+        zoomInput = Input.GetAxis(input.ZOOM);
     }
 
     void OrbitTarget()
@@ -129,14 +146,109 @@ public class CamaraPrueba : MonoBehaviour {
 
     void ZoomInOnTarget()
     {
-        position.distanceFromTarget += zoomInput * position.zoomSmooth * Time.deltaTime;
+        position.newDistance += position.zoomStep * zoomInput;
+
+        position.distanceFromTarget = Mathf.Lerp(position.distanceFromTarget, position.newDistance, position.zoomSmooth * Time.deltaTime);
+
         if(position.distanceFromTarget > position.maxZoom)
         {
             position.distanceFromTarget = position.maxZoom;
+            position.newDistance = position.maxZoom;
         }
         if(position.distanceFromTarget < position.minZoom)
         {
             position.distanceFromTarget = position.minZoom;
+            position.newDistance = position.minZoom;
+        }
+    }
+    
+    [System.Serializable]
+    public class CollisionHandler
+    {
+        public LayerMask collisionLayer;
+
+        [HideInInspector]
+        public bool colliding = false;
+        [HideInInspector]
+        public Vector3[] adjustedCameraClipPoints;
+        [HideInInspector]
+        public Vector3[] desiredCameraClipPoints;
+
+        Camera camera;
+
+        public void Initialize(Camera cam)
+        {
+            camera = cam;
+            adjustedCameraClipPoints = new Vector3[5];
+            desiredCameraClipPoints = new Vector3[5];
+        }
+
+        public void UpdateCameraClipPoints(Vector3 cameraPosition, Quaternion atRotation, ref Vector3[] intoArray)
+        {
+            if (!camera)
+                return;
+
+            intoArray = new Vector3[5];
+
+            float z = camera.nearClipPlane;
+            float x = Mathf.Tan(camera.fieldOfView / 3.41f) * z;
+            float y = x / camera.aspect;
+
+            intoArray[0] = (atRotation * new Vector3(-x, y, z)) + cameraPosition; //top-left
+            intoArray[1] = (atRotation * new Vector3(x, y, z)) + cameraPosition; //top-right
+            intoArray[2] = (atRotation * new Vector3(-x, -y, z)) + cameraPosition; //bottom-left
+            intoArray[3] = (atRotation * new Vector3(x, -y, -z)) + cameraPosition; //bottom-right
+            intoArray[4] = cameraPosition - camera.transform.forward; //camera position
+        }
+
+        bool CollisionDetectedAtClipPoints(Vector3[] clipPoints, Vector3 fromPosition)
+        {
+            for(int i = 0; i < clipPoints.Length; i++)
+            {
+                Ray ray = new Ray(fromPosition, clipPoints[i] - fromPosition);
+                float distance = Vector3.Distance(clipPoints[i], fromPosition);
+                if(Physics.Raycast(ray, distance, collisionLayer))
+                    return true;
+            }
+            return false;
+        }
+
+        public float GetAdjustedDistanceWithRay(Vector3 from)
+        {
+            float distance = -1;
+
+            for(int i = 0; i < desiredCameraClipPoints.Length; i++)
+            {
+                Ray ray = new Ray(from, adjustedCameraClipPoints[i] - from);
+                RaycastHit hit;
+                if(Physics.Raycast(ray, out hit))
+                {
+                    if(distance == -1)
+                        distance = hit.distance;
+                    else
+                    {
+                        if(hit.distance < distance)
+                            distance = hit.distance;
+                    }
+                }
+            }
+
+            if (distance == -1)
+                return 0;
+            else
+                return distance;
+        }
+
+        public void CheckColliding(Vector3 targetPosition)
+        {
+            if (CollisionDetectedAtClipPoints(desiredCameraClipPoints, targetPosition))
+            {
+                colliding = true;
+            }
+            else
+            {
+                colliding = false;
+            }
         }
     }
 }
