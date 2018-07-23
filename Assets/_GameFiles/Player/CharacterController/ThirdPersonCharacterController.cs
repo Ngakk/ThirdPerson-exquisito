@@ -171,7 +171,8 @@ namespace Mangos
 
                 interactuable.transform.localRotation = Quaternion.identity;
                 interactuable.transform.localPosition = Vector3.zero;
-
+                tempW.InteractRange.enabled = false;
+                interactuable = null;
             }
             
         }
