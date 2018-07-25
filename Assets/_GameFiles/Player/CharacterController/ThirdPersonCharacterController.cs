@@ -25,6 +25,7 @@ namespace Mangos
         private bool canMove;
         private bool holdingItem;
         private bool canInteract;
+        private bool velZeroFrame;
 
         private void Awake()
         {
@@ -69,10 +70,15 @@ namespace Mangos
 			}
 
             //Animacion
-            if (rigi.velocity == Vector3.zero)
+            if (rigi.velocity == Vector3.zero && velZeroFrame)
                 anim.SetBool("IsMoving", false);
+            else if (rigi.velocity == Vector3.zero)
+                velZeroFrame = true;
             else
+            {
                 anim.SetBool("IsMoving", true);
+                velZeroFrame = false;
+            }
         }
 
         public void onActionDown()
