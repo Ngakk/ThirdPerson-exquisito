@@ -16,6 +16,7 @@ public class CamaraPrueba : MonoBehaviour {
         public float minZoom = -15;
         public bool smoothFollow = true;
         public float smooth = 0.05f;
+        public float secondSmooth = 15f;
 
         [HideInInspector]
         public float newDistance = -8;
@@ -28,10 +29,10 @@ public class CamaraPrueba : MonoBehaviour {
     {
         public float xRotation = -20;
         public float yRotation = -180;
-        public float maxXRotation = 15;
-        public float minXRotation = -55;
-        public float vOrbitSmooth = 150;
-        public float hOrbitSmooth = 150;
+        public float maxXRotation = 25;
+        public float minXRotation = -5;
+        public float vOrbitSmooth = 7;
+        public float hOrbitSmooth = 16;
     }
 
     [System.Serializable]
@@ -47,7 +48,9 @@ public class CamaraPrueba : MonoBehaviour {
         public string Snap = "Snap";
         public string cam_Horizontal = "camHorizontal";
         public string cam_Vertical = "camVertical";
-        public string zoom = "zoom";
+        public string zoom = "Mouse ScrollWheel";
+        public string mouseOrbitH = "Mouse Orbit";
+        public string mouseOrbitV = "MouseOrbitVertical";
     }
 
     public PositionSettings position = new PositionSettings();
@@ -83,27 +86,71 @@ public class CamaraPrueba : MonoBehaviour {
     void Update()
     {
         GetInput();
-        OrbitTarget();
         ZoomInOnTarget();
     }
-	
-	void LateUpdate () {
+
+    void FixedUpdate()
+    {
         MoveToTarget();
         LookAtTarget();
-	}
+        OrbitTarget();
+        OrbitTarget();
+
+        collision.UpdateCameraClipPoints(transform.position, transform.rotation, ref collision.adjustedCameraClipPoints);
+        collision.UpdateCameraClipPoints(destination, transform.rotation, ref collision.desiredCameraClipPoints);
+
+        for(int i = 0; i<5; i++)
+        {
+            if(debug.drawDesiredCollisionLines)
+            {
+                Debug.DrawLine(targetPos, collision.desiredCameraClipPoints[i], Color.white);
+            }
+            if(debug.drawAdjustedCollisionLines)
+            {
+                Debug.DrawLine(targetPos, collision.adjustedCameraClipPoints[i], Color.green);
+            }
+        }
+
+        collision.CheckColliding(targetPos);
+        position.adjustmentDistance = collision.GetAdjustedDistanceWithRay(targetPos);
+    }
 
     void MoveToTarget()
     {
         targetPos = target.position + position.targetPosOffset;
         destination = Quaternion.Euler(orbit.xRotation, orbit.yRotation + target.eulerAngles.y, 0) * -Vector3.forward * position.distanceFromTarget;
         destination += target.position;
-        transform.position = destination;
+
+        if(collision.colliding)
+        {
+            adjustedDestination = Quaternion.Euler(orbit.xRotation, orbit.yRotation + target.eulerAngles.y, 0) * Vector3.forward * position.adjustmentDistance;
+            adjustedDestination += targetPos;
+
+            if(position.smoothFollow)
+            {
+                transform.position = Vector3.SmoothDamp(transform.position, adjustedDestination, ref camVel, position.smooth);
+            }
+            else
+            {
+                transform.position = adjustedDestination;
+            }
+        } else
+        {
+            if (position.smoothFollow)
+            {
+                transform.position = Vector3.SmoothDamp(transform.position, destination, ref camVel, position.smooth);
+            }
+            else
+            {
+                transform.position = destination;
+            }
+        }
     }
 
     void LookAtTarget()
     {
         Quaternion targetRotation = Quaternion.LookRotation(targetPos - transform.position);
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, position.smooth * Time.deltaTime);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, position.secondSmooth * Time.deltaTime);
     }
 
     void SetCameraTarget(Transform t)
@@ -118,10 +165,34 @@ public class CamaraPrueba : MonoBehaviour {
     
     void GetInput()
     {
-        vOrbitInput = Input.GetAxis("camVertical");
-        hOrbitInput = Input.GetAxis("camHorizontal");
-        hOrbitSnapInput = Input.GetAxis(input.ORBIT_HORIZONTAL_SNAP);
-        zoomInput = Input.GetAxis(input.ZOOM);
+        vOrbitInput = Input.GetAxis(input.cam_Vertical);
+        hOrbitInput = Input.GetAxis(input.cam_Horizontal);
+        hOrbitSnapInput = Input.GetAxis(input.Snap);
+        zoomInput = Input.GetAxis(input.zoom);
+        //mouseOrbitInput = Input.GetAxis(input.);
+        //vMouseOrbitInput = Input.GetAxis("");
+    }
+
+    void MouseOrbitTarget()
+    {
+        previousMousePos = currentMousePos;
+        currentMousePos = Input.mousePosition;
+
+        Vector3.Normalize(previousMousePos);
+        Vector3.Normalize(currentMousePos);
+
+        if(mouseOrbitInput > 0)
+        {
+            orbit.xRotation += (currentMousePos.y - previousMousePos.y) * orbit.vOrbitSmooth;
+            orbit.yRotation += (currentMousePos.x - previousMousePos.x) * orbit.hOrbitSmooth;
+        }
+
+        if(vMouseOrbitInput > 0)
+        {
+            orbit.xRotation += (currentMousePos.y - previousMousePos.y) * (orbit.vOrbitSmooth / 2);
+        }
+
+        CheckVerticalRotation();
     }
 
     void OrbitTarget()
@@ -134,14 +205,7 @@ public class CamaraPrueba : MonoBehaviour {
         orbit.xRotation += -vOrbitInput * orbit.vOrbitSmooth * Time.deltaTime;
         orbit.yRotation += -hOrbitInput * orbit.hOrbitSmooth * Time.deltaTime;
 
-        if(orbit.xRotation > orbit.maxXRotation)
-        {
-            orbit.xRotation = orbit.maxXRotation;
-        }
-        if(orbit.xRotation < orbit.minXRotation)
-        {
-            orbit.xRotation = orbit.minXRotation;
-        }
+        CheckVerticalRotation();
     }
 
     void ZoomInOnTarget()
@@ -159,6 +223,18 @@ public class CamaraPrueba : MonoBehaviour {
         {
             position.distanceFromTarget = position.minZoom;
             position.newDistance = position.minZoom;
+        }
+    }
+
+    void CheckVerticalRotation()
+    {
+        if (orbit.xRotation > orbit.maxXRotation)
+        {
+            orbit.xRotation = orbit.maxXRotation;
+        }
+        if (orbit.xRotation < orbit.minXRotation)
+        {
+            orbit.xRotation = orbit.minXRotation;
         }
     }
     
