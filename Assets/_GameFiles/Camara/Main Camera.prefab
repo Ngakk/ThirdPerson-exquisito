@@ -106,7 +106,7 @@ MonoBehaviour:
     maxZoom: -2
     minZoom: -15
     smoothFollow: 1
-    smooth: 0.05
+    smooth: 0.02
     secondSmooth: 15
     newDistance: -8
     adjustmentDistance: -8
@@ -115,8 +115,8 @@ MonoBehaviour:
     yRotation: -180
     maxXRotation: 25
     minXRotation: -50
-    vOrbitSmooth: 7
-    hOrbitSmooth: 16
+    vOrbitSmooth: 9
+    hOrbitSmooth: 19
   input:
     Snap: Snap
     cam_Horizontal: camHorizontal
