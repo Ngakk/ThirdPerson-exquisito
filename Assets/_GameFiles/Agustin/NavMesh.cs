@@ -1,18 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(NavMeshAgent))]
 public class NavMesh : MonoBehaviour {
 	
 	public NavMeshAgent nav;
-	public Transform Obj;
+	public GameObject Obj;
 	public Animator anim;
 	
 	float delay = 1.0f;
-	
 	float delay_triple = 0.5f;
-		
 	int contador = 0;
 	
 	Vector3 PosActual;
@@ -47,34 +46,29 @@ public class NavMesh : MonoBehaviour {
 		PosActual = gameObject.transform.position;
 		delay = 1.0f;
 		hp = 100.0f;
+        anim = GetComponent<Animator>();
+        Obj = GameObject.FindGameObjectWithTag("Player");
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		nav.SetDestination(Obj.position);
-		
+		nav.SetDestination(Obj.transform.position);
 		if(hp <= 0.0f)
-		{
 			gameObject.SetActive(false);
-		}
 		
 		if(PosActual != transform.position)
-		{
 			anim.SetBool("Steps", true);
-		}
+
 		else
 		{
 			anim.SetBool("Steps", false);
-			
 			delay -= Time.deltaTime;
-			
 			if(hp > 75 && hp <= 100)
 			{
 				if(delay <= 0.0f)
 				{
 					Disparo();
-				
 					delay = 1.0f;
 				}
 			}
@@ -83,44 +77,27 @@ public class NavMesh : MonoBehaviour {
 				if(delay <= 0.0f)
 				{
 					delay_triple -= Time.deltaTime;
-					
 					if(delay_triple <= 0)
 					{
 						Disparo();
-						
 						contador++;
-						
 						delay_triple = 0.5f;
-						
 						if(contador == 3)
 						{
 							delay_triple = 0.5f;
-							
 							delay = 1.0f;
-							
 							contador = 0;
 						}
 					}
 				}
 			}
-			else if(hp > 25.0f && hp <= 50.0f)
-			{
-				
-			}
-			
-			else if(hp > 0.0f && hp <= 25.0f)
-			{
-				
-			}
 		}
-		
 		PosActual = transform.position;
 	}
 	
 	void Disparo()
 	{
 		GameObject go = Generar_Bala();
-		
 		go.GetComponent<Rigidbody>().AddForce(transform.forward * 500);
 	}
 }

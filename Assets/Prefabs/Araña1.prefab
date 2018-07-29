@@ -421,7 +421,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4862264225715810}
   - component: {fileID: 95431329973981386}
-  - component: {fileID: 114533007784075234}
   - component: {fileID: 195380766624464758}
   - component: {fileID: 114011952788729572}
   m_Layer: 0
@@ -756,7 +755,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1933278164532684}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.1237788, y: 0.0004966556, z: 8.767064}
+  m_LocalPosition: {x: 74.518585, y: 43.138107, z: 99.31288}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4629325115792968}
@@ -1373,19 +1372,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nav: {fileID: 195380766624464758}
   Obj: {fileID: 0}
---- !u!114 &114533007784075234
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1933278164532684}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c849ea9fce87a3943935b8783510e2ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Velocidad: {x: 10, y: 20, z: 100}
-  anim: {fileID: 95431329973981386}
+  anim: {fileID: 0}
 --- !u!195 &195380766624464758
 NavMeshAgent:
   m_ObjectHideFlags: 1
