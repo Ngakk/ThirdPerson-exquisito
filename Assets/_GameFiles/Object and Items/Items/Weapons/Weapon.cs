@@ -37,6 +37,7 @@ namespace Mangos
             {
                 colls[i].isTrigger = false;
             }
+            InteractRange.isTrigger = true;
         }
     }
 }
