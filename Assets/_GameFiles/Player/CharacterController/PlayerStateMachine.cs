@@ -43,6 +43,11 @@ namespace Mangos
                 StaticManager.playerController.setCanMove(true);
             }
 
+            if (stateMachinePathHash == Animator.StringToHash("Actions.Use"))
+            {
+                StaticManager.playerController.anim.ResetTrigger("Interact");
+            }
+
             if (stateMachinePathHash == Animator.StringToHash("Base Layer.Idles"))
             {
                 

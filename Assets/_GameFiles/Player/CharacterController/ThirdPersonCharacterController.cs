@@ -10,7 +10,8 @@ namespace Mangos
     {
 		Rigidbody rigi;
 		Camera cam;
-        Animator anim;
+        [HideInInspector]
+        public Animator anim;
         [HideInInspector]
         public GameObject interactuable;
         WeaponManager weaponManager;
@@ -273,6 +274,7 @@ namespace Mangos
             {
                 toThrow.transform.parent = null;
                 toThrow.GetComponent<Weapon>().OnWeaponDrop();
+                toThrow.GetComponent<Weapon>().rigi.velocity = rigi.velocity;
                 toThrow.GetComponent<Weapon>().rigi.AddForce(transform.forward * 10, ForceMode.Impulse);
                 weaponManager.throwSecondary();
             }
