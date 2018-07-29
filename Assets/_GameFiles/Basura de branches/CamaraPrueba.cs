@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CamaraPrueba : MonoBehaviour {
 
@@ -8,8 +6,9 @@ public class CamaraPrueba : MonoBehaviour {
     [System.Serializable]
     public class PositionSettings
     {
-        public Vector3 targetPosOffset = new Vector3(0, 3.4f, 0);
+        public Vector3 targetPosOffset = new Vector3(0, 2.57f, 0);
         public float distanceFromTarget = -8;
+        public float maxDistance = -10;
         public float zoomSmooth = 10;
         public float zoomStep = 2;
         public float maxZoom = -2;
@@ -94,7 +93,7 @@ public class CamaraPrueba : MonoBehaviour {
         MoveToTarget();
         LookAtTarget();
         OrbitTarget();
-        OrbitTarget();
+        MouseOrbitTarget();
 
         collision.UpdateCameraClipPoints(transform.position, transform.rotation, ref collision.adjustedCameraClipPoints);
         collision.UpdateCameraClipPoints(destination, transform.rotation, ref collision.desiredCameraClipPoints);
@@ -102,13 +101,10 @@ public class CamaraPrueba : MonoBehaviour {
         for(int i = 0; i<5; i++)
         {
             if(debug.drawDesiredCollisionLines)
-            {
                 Debug.DrawLine(targetPos, collision.desiredCameraClipPoints[i], Color.white);
-            }
+
             if(debug.drawAdjustedCollisionLines)
-            {
                 Debug.DrawLine(targetPos, collision.adjustedCameraClipPoints[i], Color.green);
-            }
         }
 
         collision.CheckColliding(targetPos);
@@ -127,23 +123,17 @@ public class CamaraPrueba : MonoBehaviour {
             adjustedDestination += targetPos;
 
             if(position.smoothFollow)
-            {
                 transform.position = Vector3.SmoothDamp(transform.position, adjustedDestination, ref camVel, position.smooth);
-            }
+
             else
-            {
                 transform.position = adjustedDestination;
-            }
         } else
         {
             if (position.smoothFollow)
-            {
                 transform.position = Vector3.SmoothDamp(transform.position, destination, ref camVel, position.smooth);
-            }
+
             else
-            {
                 transform.position = destination;
-            }
         }
     }
 
@@ -188,9 +178,7 @@ public class CamaraPrueba : MonoBehaviour {
         }
 
         if(vMouseOrbitInput > 0)
-        {
             orbit.xRotation += (currentMousePos.y - previousMousePos.y) * (orbit.vOrbitSmooth / 2);
-        }
 
         CheckVerticalRotation();
     }
@@ -198,9 +186,7 @@ public class CamaraPrueba : MonoBehaviour {
     void OrbitTarget()
     {
         if(hOrbitSnapInput > 0)
-        {
             orbit.yRotation = -180;
-        }
 
         orbit.xRotation += -vOrbitInput * orbit.vOrbitSmooth * Time.deltaTime;
         orbit.yRotation += -hOrbitInput * orbit.hOrbitSmooth * Time.deltaTime;
@@ -229,13 +215,10 @@ public class CamaraPrueba : MonoBehaviour {
     void CheckVerticalRotation()
     {
         if (orbit.xRotation > orbit.maxXRotation)
-        {
             orbit.xRotation = orbit.maxXRotation;
-        }
+
         if (orbit.xRotation < orbit.minXRotation)
-        {
             orbit.xRotation = orbit.minXRotation;
-        }
     }
     
     [System.Serializable]
@@ -318,13 +301,9 @@ public class CamaraPrueba : MonoBehaviour {
         public void CheckColliding(Vector3 targetPosition)
         {
             if (CollisionDetectedAtClipPoints(desiredCameraClipPoints, targetPosition))
-            {
                 colliding = true;
-            }
             else
-            {
                 colliding = false;
-            }
         }
     }
 }
