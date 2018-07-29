@@ -20,11 +20,23 @@ namespace Mangos
         public virtual void OnWeaponSet()
         {
             InteractRange.enabled = false;
+            rigi.isKinematic = true;
+            Collider[] colls = GetComponentsInChildren<Collider>();
+            for(int i = 0; i < colls.Length; i++)
+            {
+                colls[i].isTrigger = true;
+            }
         }
 
         public virtual void OnWeaponDrop()
         {
             InteractRange.enabled = true;
+            rigi.isKinematic = false;
+            Collider[] colls = GetComponentsInChildren<Collider>();
+            for (int i = 0; i < colls.Length; i++)
+            {
+                colls[i].isTrigger = false;
+            }
         }
     }
 }

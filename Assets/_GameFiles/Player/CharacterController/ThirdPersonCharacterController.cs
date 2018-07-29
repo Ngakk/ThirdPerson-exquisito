@@ -11,9 +11,10 @@ namespace Mangos
 		Rigidbody rigi;
 		Camera cam;
         Animator anim;
-        GameObject interactuable;
+        [HideInInspector]
+        public GameObject interactuable;
         WeaponManager weaponManager;
-        public Transform rightHand, leftHand;
+        public Transform rightHand, leftHand, sheat;
 		[HideInInspector]
 		public Vector3 dir, lookDir;
 		Vector3 scaler;
@@ -21,6 +22,8 @@ namespace Mangos
 		[Range(0, 1)]
 	    public float rotationSpeed;
 	    public float m_angle;
+
+        public GameObject unsheatable;
 
         private bool canMove;
         private bool holdingItem;
@@ -47,7 +50,7 @@ namespace Mangos
 
         void Update()
         {
-
+            unsheatable = weaponManager.getCurrentSheatedWeapon();
         }
 
         public void Move(float xAxis, float yAxis)
@@ -83,7 +86,25 @@ namespace Mangos
 
         public void onActionDown()
         {
-            anim.SetTrigger("Use");
+            int useid = weaponManager.attack();
+            if(useid != -1)
+            {
+                anim.SetTrigger("ExitHold");
+                anim.SetInteger("UseId", useid);
+                anim.SetTrigger("Use");
+            }
+            
+        }
+
+        public void onAction2Down()
+        {
+            int useid = weaponManager.attack2();
+            if(useid != -1)
+            {
+                anim.SetTrigger("ExitHold");
+                anim.SetInteger("UseId", useid);
+                anim.SetTrigger("Use");
+            }
         }
 
         public void onDashDown()
@@ -101,6 +122,8 @@ namespace Mangos
                     switch (temp.actionType)
                     {
                         case ActionId.pickup:
+                            onPrePickup((int)temp.GetHoldId());
+                            anim.SetInteger("InteractId", temp.GetHoldId());
                             anim.SetTrigger("Interact");
                             anim.SetInteger("HoldId", (int)temp.holdId);
                             break;
@@ -113,6 +136,11 @@ namespace Mangos
                     }
                     temp.OnInteract();
                 }
+            }
+            else
+            {
+                if (weaponManager.getCurrentPrimaryWeapon() != null)
+                    startSheatWeapon();
             }
         }
 
@@ -162,7 +190,6 @@ namespace Mangos
 
         public void takeWeaponInHands()
         {
-            Debug.Log("weapon taken");
             if(interactuable.GetComponent<Weapon>() != null)
             {
                 Weapon tempW = interactuable.GetComponent<Weapon>();
@@ -181,6 +208,74 @@ namespace Mangos
                 interactuable = null;
             }
             
+        }
+
+        public void onPrePickup(int hold)
+        {
+            bool[] actions = weaponManager.onPrePickup(hold);
+            if (actions[0])
+            {
+                dropWeapon(weaponManager.getCurrentPrimaryWeapon());
+            }
+            if (actions[1])
+            {
+                setCanMove(false);
+                startSheatWeapon();
+            }
+            else
+            {
+                anim.SetTrigger("ExitHold");
+            }
+            if (actions[2])
+            {
+                dropWeapon(weaponManager.getCurrentSecondaryWeapon());
+            }
+        }
+
+        public void startSheatWeapon()
+        {
+            anim.SetInteger("UseId", 3);
+            anim.SetTrigger("Use");
+            anim.SetTrigger("ExitHold");
+        }
+
+        public void dropWeapon(GameObject weapon)
+        {
+            weapon.transform.parent = null;
+            weapon.GetComponent<Weapon>().OnWeaponDrop();
+        }
+
+        public void SheatWeapon()
+        {
+            GameObject toSheat = weaponManager.getCurrentPrimaryWeapon();
+            toSheat.transform.parent = sheat;
+            toSheat.transform.localRotation = Quaternion.identity;
+            toSheat.transform.localPosition = Vector3.zero;
+            weaponManager.SheatWeapon();
+        }
+
+        public void UnsheatWeapon()
+        {
+            GameObject toUnsheat = weaponManager.getCurrentSheatedWeapon();
+            if (toUnsheat != null)
+            {
+                toUnsheat.transform.parent = rightHand;
+                toUnsheat.transform.localRotation = Quaternion.identity;
+                toUnsheat.transform.localPosition = Vector3.zero;
+                weaponManager.UnsheatWeapon();
+            }
+        }
+
+        public void throwSecondary()
+        {
+            GameObject toThrow = weaponManager.getCurrentSecondaryWeapon();
+            if(toThrow != null)
+            {
+                toThrow.transform.parent = null;
+                toThrow.GetComponent<Weapon>().OnWeaponDrop();
+                toThrow.GetComponent<Weapon>().rigi.AddForce(transform.forward * 10, ForceMode.Impulse);
+                weaponManager.throwSecondary();
+            }
         }
     } 
 }

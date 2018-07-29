@@ -26,8 +26,10 @@ namespace Mangos {
     {
         nothing,
         gloves,
-        oneHand,
-        oneHandHeavy,
+        oneHandRight,
+        oneHandHeavyRight,
+        oneHandLeft,
+        oneHandHeavyLeft,
         twoHand,
         twoHandHeavy,
         twoHandOverhead

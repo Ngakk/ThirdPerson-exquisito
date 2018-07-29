@@ -50,7 +50,6 @@ namespace Mangos {
 				PoolManager.PreSpawn(sounds[i], (int)Mathf.Round(maxSimultaneousClip[i]/2));
 				PoolManager.SetPoolLimit(sounds[i], maxSimultaneousClip[i]);
 			}
-			print("audio manager start ended");
 		}
 		
 		

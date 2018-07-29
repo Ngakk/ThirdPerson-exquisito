@@ -24,25 +24,28 @@ namespace Mangos
 
         public override void OnStateMachineEnter(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller)
         {
-            if(stateMachinePathHash == Animator.StringToHash("Base Layer.Interact"))
+            if(stateMachinePathHash == Animator.StringToHash("Actions.Interact"))
             {
                 StaticManager.playerController.setCanMove(false);
-                animator.SetTrigger("ExitHold");
             }
 
             if (stateMachinePathHash == Animator.StringToHash("Base Layer.Idles"))
             {
                 animator.SetInteger("IdleId", Random.Range(0, 4));
-                Debug.Log("idles");
             }
+
         }
 
         public override void OnStateMachineExit(Animator animator, int stateMachinePathHash)
         {
-            if (stateMachinePathHash == Animator.StringToHash("Base Layer.Interact"))
+            if (stateMachinePathHash == Animator.StringToHash("Actions.Interact"))
             {
-                animator.SetTrigger("EnterHold");
                 StaticManager.playerController.setCanMove(true);
+            }
+
+            if (stateMachinePathHash == Animator.StringToHash("Base Layer.Idles"))
+            {
+                
             }
         }
     }

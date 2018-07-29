@@ -4,15 +4,19 @@ using UnityEngine;
 
 namespace Mangos
 {
-    [RequireComponent(typeof (SphereCollider))]
+    [RequireComponent(typeof(SphereCollider))]
+    [RequireComponent(typeof(Rigidbody))]
     public class Interactuable : MangosBehaviour
     {
         public ActionId actionType;
         public ObjectHoldId holdId;
         public SphereCollider InteractRange;
+        [HideInInspector]
+        public Rigidbody rigi;
 
         private void Start()
         {
+            rigi = GetComponent<Rigidbody>();
             Init();
         }
 

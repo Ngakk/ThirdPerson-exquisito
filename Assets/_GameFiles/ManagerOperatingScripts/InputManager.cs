@@ -6,7 +6,8 @@ namespace Mangos {
 	public class InputManager : MonoBehaviour {
 
         KeyCode attack = KeyCode.J;
-        KeyCode dash = KeyCode.K;
+        KeyCode attack2 = KeyCode.K;
+        KeyCode dash = KeyCode.I;
         KeyCode interact = KeyCode.U;
 
 		void Awake(){
@@ -22,6 +23,8 @@ namespace Mangos {
                     StaticManager.playerController.Move(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
                     if (Input.GetKeyDown(attack))
                         StaticManager.playerController.onActionDown();
+                    if (Input.GetKeyDown(attack2))
+                        StaticManager.playerController.onAction2Down();
                     if (Input.GetKeyDown(dash))
                         StaticManager.playerController.onDashDown();
                     if (Input.GetKeyDown(interact))
