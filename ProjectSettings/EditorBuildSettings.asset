@@ -4,4 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Agustin/NavMesh.unity
+    guid: 9f46ca1f63f65124588c78cff37f353e
+  m_configObjects: {}
