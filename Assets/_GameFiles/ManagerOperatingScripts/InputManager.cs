@@ -13,7 +13,7 @@ namespace Mangos {
 		void Awake(){
 			StaticManager.inputManager = this;
 		}
-			
+
 		void Update(){
 			switch (StaticManager.gameManager.gameState) {
                 case GameState.mainMenu:
@@ -30,7 +30,7 @@ namespace Mangos {
                     if (Input.GetKeyDown(interact))
                         StaticManager.playerController.onInteractDown();
 				    break;
-                
+
 			}
 		}
 	}
