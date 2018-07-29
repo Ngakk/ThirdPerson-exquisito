@@ -24,8 +24,6 @@ namespace Mangos
 	    public float rotationSpeed;
 	    public float m_angle;
 
-        public GameObject unsheatable;
-
         private bool canMove;
         private bool holdingItem;
         private bool canInteract;
@@ -51,7 +49,7 @@ namespace Mangos
 
         void Update()
         {
-            unsheatable = weaponManager.getCurrentSheatedWeapon();
+
         }
 
         public void Move(float xAxis, float yAxis)
@@ -140,8 +138,10 @@ namespace Mangos
             }
             else
             {
-                if (weaponManager.getCurrentPrimaryWeapon() != null)
+                if (weaponManager.getCurrentPrimaryWeapon() != null && weaponManager.getCurrentSheatedWeapon() == null)
                     startSheatWeapon();
+                else if (weaponManager.getCurrentPrimaryWeapon() != null && weaponManager.getCurrentSheatedWeapon() != null)
+                    startSwitchWeapon();
             }
         }
 
@@ -240,6 +240,13 @@ namespace Mangos
             anim.SetTrigger("ExitHold");
         }
 
+        public void startSwitchWeapon()
+        {
+            anim.SetInteger("UseId", 4);
+            anim.SetTrigger("Use");
+            anim.SetTrigger("ExitHold");
+        }
+
         public void dropWeapon(GameObject weapon)
         {
             weapon.transform.parent = null;
@@ -265,6 +272,28 @@ namespace Mangos
                 toUnsheat.transform.localPosition = Vector3.zero;
                 weaponManager.UnsheatWeapon();
             }
+        }
+
+        public void SwapWeapon()
+        {
+            GameObject toHand = weaponManager.getCurrentSheatedWeapon();
+            GameObject toSheat = weaponManager.getCurrentPrimaryWeapon();
+
+            if(toHand != null)
+            {
+                toHand.transform.parent = rightHand;
+                toHand.transform.localRotation = Quaternion.identity;
+                toHand.transform.localPosition = Vector3.zero;
+            }
+
+            if(toSheat != null)
+            {
+                toSheat.transform.parent = sheat;
+                toSheat.transform.localRotation = Quaternion.identity;
+                toSheat.transform.localPosition = Vector3.zero;
+            }
+
+            weaponManager.SheatWeapon();
         }
 
         public void throwSecondary()
