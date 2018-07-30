@@ -63,9 +63,10 @@ namespace Mangos
                 return;
             }
 
-			//Movement
-		    dir = Vector3.Scale (cam.transform.forward, scaler).normalized * yAxis + Vector3.Scale(cam.transform.right, scaler).normalized * xAxis;
-			rigi.velocity = speed * dir.normalized;
+            //Movement
+            dir = Vector3.Scale (cam.transform.forward, scaler).normalized * yAxis + Vector3.Scale(cam.transform.right, scaler).normalized * xAxis;
+            //dir = Vector3.Scale(transform.forward, scaler).normalized * yAxis + Vector3.Scale(transform.right, scaler).normalized * xAxis;
+            rigi.velocity = speed * dir.normalized;
 
 		    //Rotation
 		    lookDir += (rigi.velocity - lookDir) * rotationSpeed;
