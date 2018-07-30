@@ -104,12 +104,14 @@ public class NavMesh : MonoBehaviour {
 
     public void GetHit()
     {
+        Debug.Log("got hit");
         hp--;
-        DamageStop();
+        StartCoroutine("DamageStop");
     }
 
     IEnumerator<WaitForEndOfFrame> DamageStop()
 	{
+        Debug.Log("DamageStop");
 		vulnerable = false;
 		GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.white);
 		float startTime = Time.time;
@@ -122,6 +124,8 @@ public class NavMesh : MonoBehaviour {
 		
 		gameObject.GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.black);
 		vulnerable = true;
+        if (hp <= 0)
+            gameObject.SetActive(false);
 	}
 
     void Disparo()
