@@ -64,16 +64,16 @@ namespace Mangos
             //Movement
             dir = Vector3.Scale (cam.transform.forward, scaler).normalized * yAxis + Vector3.Scale(cam.transform.right, scaler).normalized * xAxis;
             //dir = Vector3.Scale(transform.forward, scaler).normalized * yAxis + Vector3.Scale(transform.right, scaler).normalized * xAxis;
-            rigi.velocity = speed * dir.normalized;
+            rigi.velocity = new Vector3(speed * dir.normalized.x, rigi.velocity.y, speed*dir.normalized.z);
 
 		    //Rotation
-		    lookDir += (rigi.velocity - lookDir) * rotationSpeed;
+		    lookDir += (Vector3.Scale(rigi.velocity, scaler) - lookDir) * rotationSpeed;
 			if (rigi.velocity != Vector3.zero) {
 				transform.LookAt (transform.position + lookDir.normalized);
 			}
 
             //Animacion
-            if (rigi.velocity == Vector3.zero && velZeroFrame)
+            if (Vector3.Scale(rigi.velocity, scaler) == Vector3.zero && velZeroFrame)
                 anim.SetBool("IsMoving", false);
             else if (rigi.velocity == Vector3.zero)
                 velZeroFrame = true;

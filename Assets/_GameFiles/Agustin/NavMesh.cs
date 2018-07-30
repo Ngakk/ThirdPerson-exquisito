@@ -9,14 +9,18 @@ public class NavMesh : MonoBehaviour {
 	public NavMeshAgent nav;
 	public GameObject Obj;
 	public Animator anim;
-	
-	float delay = 1.0f;
+
+    bool vulnerable = true;
+
+    float invulnerableTime = 0.2f;
+
+    float delay = 1.0f;
 	float delay_triple = 0.5f;
 	int contador = 0;
 	
 	Vector3 PosActual;
 	
-	float hp;
+	float hp = 3;
 	
 	// Pool Bala
 	List<GameObject> Bala = new List<GameObject>();
@@ -93,9 +97,34 @@ public class NavMesh : MonoBehaviour {
 			}
 		}
 		PosActual = transform.position;
+
+        if (Input.GetKeyDown(KeyCode.C))
+            DamageStop();
 	}
-	
-	void Disparo()
+
+    public void GetHit()
+    {
+        hp--;
+        DamageStop();
+    }
+
+    IEnumerator<WaitForEndOfFrame> DamageStop()
+	{
+		vulnerable = false;
+		GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.white);
+		float startTime = Time.time;
+		
+		while (Time.time < startTime +invulnerableTime) 
+		{
+			gameObject.GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.Lerp(Color.white, Color.black, Mathf.InverseLerp(startTime, startTime+invulnerableTime, Time.time) ));
+			yield return new WaitForEndOfFrame();
+		}
+		
+		gameObject.GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.black);
+		vulnerable = true;
+	}
+
+    void Disparo()
 	{
 		GameObject go = Generar_Bala();
 		go.GetComponent<Rigidbody>().AddForce(transform.forward * 500);
