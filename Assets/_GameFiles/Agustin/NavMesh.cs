@@ -5,7 +5,8 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(NavMeshAgent))]
 public class NavMesh : MonoBehaviour {
-	
+    MeshRenderer[] mesh;
+
 	public NavMeshAgent nav;
 	public GameObject Obj;
 	public Animator anim;
@@ -14,13 +15,15 @@ public class NavMesh : MonoBehaviour {
 
     float invulnerableTime = 0.2f;
 
+    float hp;
+
     float delay = 1.0f;
 	float delay_triple = 0.5f;
 	int contador = 0;
 	
 	Vector3 PosActual;
 	
-	float hp = 3;
+	float vida = 3;
 	
 	// Pool Bala
 	List<GameObject> Bala = new List<GameObject>();
@@ -52,6 +55,8 @@ public class NavMesh : MonoBehaviour {
 		hp = 100.0f;
         anim = GetComponent<Animator>();
         Obj = GameObject.FindGameObjectWithTag("Player");
+
+        mesh = GetComponentsInChildren<MeshRenderer>();
 	}
 	
 	// Update is called once per frame
@@ -99,34 +104,41 @@ public class NavMesh : MonoBehaviour {
 		PosActual = transform.position;
 
         if (Input.GetKeyDown(KeyCode.C))
-            DamageStop();
+            DamageStop1();
 	}
 
     public void GetHit()
     {
         Debug.Log("got hit");
-        hp--;
-        StartCoroutine("DamageStop");
+        if (vulnerable)
+        {
+            vida--;
+            DamageStop1();
+        }
     }
 
-    IEnumerator<WaitForEndOfFrame> DamageStop()
-	{
-        Debug.Log("DamageStop");
-		vulnerable = false;
-		GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.white);
-		float startTime = Time.time;
-		
-		while (Time.time < startTime +invulnerableTime) 
-		{
-			gameObject.GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.Lerp(Color.white, Color.black, Mathf.InverseLerp(startTime, startTime+invulnerableTime, Time.time) ));
-			yield return new WaitForEndOfFrame();
-		}
-		
-		gameObject.GetComponentInChildren<MeshRenderer> ().material.SetColor("_EmissionColor", Color.black);
-		vulnerable = true;
-        if (hp <= 0)
+    public void DamageStop1()
+    {
+        vulnerable = false;
+        for(int i = 0; i < mesh.Length; i++)
+        {
+            mesh[i].materials[0].SetColor("_EmissionColor", Color.white);
+        }
+        
+        Invoke("DamageStop2", 0.1f);
+    }
+
+    public void DamageStop2()
+    {
+        for (int i = 0; i < mesh.Length; i++)
+        {
+            mesh[i].materials[0].SetColor("_EmissionColor", Color.black);
+        }
+        vulnerable = true;
+        Debug.Log("Damage stio 2: " + vida);
+        if (vida <= 0)
             gameObject.SetActive(false);
-	}
+    }
 
     void Disparo()
 	{

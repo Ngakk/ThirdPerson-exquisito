@@ -1420,6 +1420,10 @@ Prefab:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 1674741428138574, guid: 4d952406639b3194e9e2ca636e737be9, type: 2}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d952406639b3194e9e2ca636e737be9, type: 2}
   m_IsPrefabAsset: 0
@@ -2081,6 +2085,16 @@ Prefab:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 23886119615356556, guid: b207dbfb5e66d6a46b1536e0398aa723,
+        type: 2}
+      propertyPath: m_DynamicOccludee
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114011952788729572, guid: b207dbfb5e66d6a46b1536e0398aa723,
+        type: 2}
+      propertyPath: mesh
+      value: 
+      objectReference: {fileID: 1726239727}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b207dbfb5e66d6a46b1536e0398aa723, type: 2}
   m_IsPrefabAsset: 0
@@ -4597,6 +4611,18 @@ Prefab:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 4186935777790758, guid: e210ea128a9289141b27978225232ecc, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4186935777790758, guid: e210ea128a9289141b27978225232ecc, type: 2}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4186935777790758, guid: e210ea128a9289141b27978225232ecc, type: 2}
+      propertyPath: m_LocalScale.z
+      value: 1.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e210ea128a9289141b27978225232ecc, type: 2}
   m_IsPrefabAsset: 0
@@ -5127,6 +5153,11 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 532f4aba88c2c664aaaac6960bb11a1c, type: 2}
   m_IsPrefabAsset: 0
+--- !u!23 &1726239727 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 23886119615356556, guid: b207dbfb5e66d6a46b1536e0398aa723,
+    type: 2}
+  m_PrefabInternal: {fileID: 670732277}
 --- !u!1001 &1773714964
 Prefab:
   m_ObjectHideFlags: 0
