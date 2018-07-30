@@ -9,17 +9,16 @@ namespace Mangos
     {
         override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            /*if (stateInfo.IsName("PickUp"))
-            {
-	            StaticManager.playerController.setCanMove(false);
-            }*/
-
             
+
         }
 
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            
+            if (stateInfo.IsName("Sheathing Sword"))
+            {
+                animator.ResetTrigger("Use");
+            }
         }
 
         public override void OnStateMachineEnter(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller)
@@ -45,7 +44,7 @@ namespace Mangos
 
             if (stateMachinePathHash == Animator.StringToHash("Actions.Use"))
             {
-                StaticManager.playerController.anim.ResetTrigger("Interact");
+                //StaticManager.playerController.anim.ResetTrigger("Interact");
             }
 
             if (stateMachinePathHash == Animator.StringToHash("Base Layer.Idles"))

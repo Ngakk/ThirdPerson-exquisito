@@ -88,14 +88,16 @@ namespace Mangos
            
         public void SheatWeapon()
         {
+            int temp = currentSheatedWeapon;
             currentSheatedWeapon = currentPrimaryWeapon;
-            currentPrimaryWeapon = -1;
+            currentPrimaryWeapon = temp;
         }
 
         public void UnsheatWeapon()
         {
+            int temp = currentPrimaryWeapon;
             currentPrimaryWeapon = currentSheatedWeapon;
-            currentSheatedWeapon = -1;
+            currentSheatedWeapon = temp;
         }
 
         public GameObject getCurrentPrimaryWeapon()
