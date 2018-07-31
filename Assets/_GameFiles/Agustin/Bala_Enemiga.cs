@@ -30,12 +30,12 @@ namespace Mangos
 			}
 		}
 		
-		void OnCollisionEnter(Collision _col)
+		void OnTriggerEnter(Collider _col)
 		{
-			if(_col.collider.CompareTag("Player"))
+			if(_col.CompareTag("Player"))
 			{
-				
 				gameObject.SetActive(false);
+                StaticManager.playerController.life--;
 			}
 		}
 		

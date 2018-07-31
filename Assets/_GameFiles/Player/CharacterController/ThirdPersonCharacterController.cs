@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Mangos
 {
@@ -29,6 +30,9 @@ namespace Mangos
         private bool canInteract;
         private bool velZeroFrame;
 
+        public int life = 15;
+        public int kills = 0;
+
         private void Awake()
         {
             StaticManager.playerController = this;
@@ -49,8 +53,13 @@ namespace Mangos
 
         void Update()
         {
-
+            
         }
+
+        void FixedUpdate() {
+            rigi.AddForce(Vector3.down * 1000 * Time.fixedDeltaTime);
+        }
+
 
         public void Move(float xAxis, float yAxis)
 	    {
@@ -73,13 +82,14 @@ namespace Mangos
 			}
 
             //Animacion
-            if (Vector3.Scale(rigi.velocity, scaler) == Vector3.zero && velZeroFrame)
-                anim.SetBool("IsMoving", false);
-            else if (rigi.velocity == Vector3.zero)
+            Debug.Log(Vector3.Scale(rigi.velocity, scaler).magnitude >= 0.1f);
+            if (Vector3.Scale(rigi.velocity, scaler).magnitude >= 0.1f && velZeroFrame)
+                anim.SetBool("IsMoving", true);
+            else if (Vector3.Scale(rigi.velocity, scaler).magnitude >= 0.1f)
                 velZeroFrame = true;
             else
             {
-                anim.SetBool("IsMoving", true);
+                anim.SetBool("IsMoving", false);
                 velZeroFrame = false;
             }
         }
@@ -126,6 +136,7 @@ namespace Mangos
                             anim.SetInteger("InteractId", temp.GetHoldId());
                             anim.SetTrigger("Interact");
                             anim.SetInteger("HoldId", (int)temp.holdId);
+                            transform.LookAt(new Vector3(interactuable.transform.position.x, transform.position.y, interactuable.transform.position.z));
                             break;
                         case ActionId.pocket:
 
@@ -308,6 +319,18 @@ namespace Mangos
                 toThrow.GetComponent<Weapon>().rigi.AddForce(transform.forward * 10, ForceMode.Impulse);
                 weaponManager.throwSecondary();
             }
+        }
+
+        public void Dead()
+        {
+            if (life <= 0)
+                SceneManager.LoadScene(3);
+        }
+
+        public void Win()
+        {
+            if (kills >= 5)
+                SceneManager.LoadScene(4);
         }
     } 
 }
